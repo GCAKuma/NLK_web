@@ -1,0 +1,4 @@
+-r requirements.txt
+
+# Object storage (S3 / Cloudflare R2 / DigitalOcean Spaces) — used when USE_S3=True
+django-storages[boto3]>=1.14

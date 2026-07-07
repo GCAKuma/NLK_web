@@ -1,0 +1,14 @@
+New wholesale quotation request
+
+Organization: {{ q.organization_name }}
+Type:         {{ q.get_organization_type_display }}
+Contact:      {{ q.contact_name }}
+Email:        {{ q.email }}
+Phone:        {{ q.phone }}
+
+Requirements
+-----------------------------------------
+{{ q.requirements }}
+-----------------------------------------
+
+Follow up and update the status in the admin panel.

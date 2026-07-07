@@ -1,0 +1,74 @@
+{% load humanize %}
+<form hx-get="{% url 'products:compare' %}" hx-target="#compare-panel" hx-swap="innerHTML"
+      hx-trigger="change" hx-push-url="true">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    {% for slot in slots %}
+      <div class="card border border-line p-4">
+        <label class="field-label" for="slot-{{ slot.name }}">Product {{ forloop.counter }}</label>
+        <select id="slot-{{ slot.name }}" name="{{ slot.name }}" class="field-input">
+          <option value="">Choose a calculator…</option>
+          {% for c in calculators %}
+            <option value="{{ c.id }}" {% if slot.product and slot.product.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+
+        {% if slot.product %}
+          <a href="{{ slot.product.get_absolute_url }}" class="block mt-4 text-center group">
+            <div class="h-28 w-28 mx-auto rounded-xl overflow-hidden bg-elevated mb-2">
+              {% if slot.product.primary_image %}
+                <img src="{{ slot.product.primary_image.url }}" alt="{{ slot.product.name }}" class="w-full h-full object-cover group-hover:scale-105 transition">
+              {% endif %}
+            </div>
+            <div class="text-sm font-medium text-ink group-hover:text-link transition">{{ slot.product.name }}</div>
+            {% if slot.product.display_price %}
+              <div class="font-heading font-bold text-ink">Rs. {{ slot.product.display_price|floatformat:0|intcomma }}</div>
+            {% endif %}
+          </a>
+        {% else %}
+          <div class="mt-4 h-28 flex flex-col items-center justify-center text-muted text-sm border border-dashed border-line rounded-xl">
+            <span class="text-2xl mb-1">＋</span>
+            Empty slot
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</form>
+
+{% if filled >= 2 %}
+  <div class="card border border-line overflow-x-auto mt-8">
+    <table class="w-full text-sm min-w-[560px]">
+      <thead>
+        <tr>
+          <th class="text-left p-4 bg-elevated w-40 font-medium text-muted">Specification</th>
+          {% for p in selected %}
+            <th class="p-4 bg-elevated text-center font-semibold text-ink">{{ p.name }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t border-line">
+          <td class="p-4 font-medium text-muted">Price</td>
+          {% for p in selected %}
+            <td class="p-4 text-center font-semibold text-ink">{% if p.display_price %}Rs. {{ p.display_price|floatformat:0|intcomma }}{% else %}—{% endif %}</td>
+          {% endfor %}
+        </tr>
+        <tr class="border-t border-line bg-elevated">
+          <td class="p-4 font-medium text-muted">Warranty</td>
+          {% for p in selected %}<td class="p-4 text-center text-ink">{{ p.warranty_period|default:"—" }}</td>{% endfor %}
+        </tr>
+        {% for row in rows %}
+          <tr class="border-t border-line {% cycle '' 'bg-elevated' %}">
+            <td class="p-4 font-medium text-muted">{{ row.name }}</td>
+            {% for v in row.values %}<td class="p-4 text-center text-ink">{{ v }}</td>{% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="text-center py-16 text-muted mt-8">
+    <div class="text-4xl mb-3">⚖️</div>
+    Choose at least 2 calculators above to see them side by side.
+  </div>
+{% endif %}

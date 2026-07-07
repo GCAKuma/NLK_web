@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Create account — NLK{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-md px-4 py-12">
+  <div class="card border border-line p-8">
+    <h1 class="font-heading font-bold text-2xl text-ink">Create your account</h1>
+    <p class="text-sm text-muted mt-1 mb-6">An account is required to place orders on NLK.</p>
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="field-label" for="{{ form.full_name.id_for_label }}">Full name</label>
+        {{ form.full_name }}
+        {% for e in form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label class="field-label" for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {% for e in form.email.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label class="field-label" for="{{ form.phone_number.id_for_label }}">Phone number</label>
+        {{ form.phone_number }}
+        {% for e in form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label class="field-label" for="{{ form.password1.id_for_label }}">Password</label>
+        {{ form.password1 }}
+        {% for e in form.password1.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <div>
+        <label class="field-label" for="{{ form.password2.id_for_label }}">Confirm password</label>
+        {{ form.password2 }}
+        {% for e in form.password2.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+      </div>
+      <button type="submit" class="btn-primary w-full">Create account</button>
+    </form>
+
+    <p class="text-sm text-muted mt-4 text-center">
+      Already have an account?
+      <a href="{% url 'accounts:login' %}" class="text-link font-medium">Log in</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

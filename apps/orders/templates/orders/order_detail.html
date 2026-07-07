@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_number }} — NLK{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-8">
+  <nav class="text-xs text-muted mb-4">
+    <a href="{% url 'orders:list' %}" class="hover:text-link">My Orders</a>
+    <span class="mx-1">/</span><span class="text-ink">{{ order.order_number }}</span>
+  </nav>
+
+  <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+    <div>
+      <h1 class="font-heading font-bold text-2xl text-ink">Order {{ order.order_number }}</h1>
+      <p class="text-sm text-muted">Placed on {{ order.created_at|date:"d M Y, g:i a" }}</p>
+    </div>
+    {% include "orders/_status_badge.html" %}
+  </div>
+
+  {% include "orders/_slip_upload.html" %}
+  <div class="mt-6">{% include "orders/_order_summary.html" %}</div>
+
+  {# Status timeline #}
+  {% if order.status_history.all %}
+    <div class="card border border-line p-5 mt-6">
+      <h3 class="font-heading font-semibold text-ink mb-3">Order History</h3>
+      <ol class="space-y-3">
+        {% for h in order.status_history.all %}
+          <li class="flex gap-3 text-sm">
+            <span class="mt-1 h-2 w-2 rounded-full bg-accent shrink-0"></span>
+            <div>
+              <span class="font-medium text-ink">{{ h.get_status_display }}</span>
+              <span class="text-muted">· {{ h.changed_at|date:"d M Y, g:i a" }}</span>
+              {% if h.note %}<div class="text-muted text-xs">{{ h.note }}</div>{% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

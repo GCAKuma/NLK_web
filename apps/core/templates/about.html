@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}About Us — NLK{% endblock %}
+
+{% block content %}
+<section class="bg-brand text-white">
+  <div class="mx-auto max-w-4xl px-4 py-14">
+    <h1 class="font-heading font-extrabold text-3xl md:text-4xl">About NLK (NugasewanaLK)</h1>
+    <p class="mt-2 text-white/70">Your Trusted Choice</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-4xl px-4 py-12">
+  <div class="prose max-w-none text-ink">
+    <p class="text-lg leading-relaxed">
+      NLK (NugasewanaLK) is a trusted supplier of scientific calculators and educational
+      technology solutions in Sri Lanka. With over <strong>12,000 followers</strong>,
+      <strong>100% customer recommendations</strong>, and millions of content views, NLK serves
+      students, professionals, educational institutions, and businesses with genuine products,
+      competitive prices, and reliable warranty support.
+    </p>
+  </div>
+
+  <div class="grid sm:grid-cols-2 gap-5 mt-10">
+    <div class="card border border-line p-5"><div class="text-2xl">✅</div><h3 class="font-heading font-semibold text-ink mt-2">Genuine Products</h3><p class="text-sm text-muted mt-1">Authentic calculators and electronics, sourced responsibly.</p></div>
+    <div class="card border border-line p-5"><div class="text-2xl">🛡️</div><h3 class="font-heading font-semibold text-ink mt-2">Warranty Support</h3><p class="text-sm text-muted mt-1">Reliable after-sales and warranty backing on every purchase.</p></div>
+    <div class="card border border-line p-5"><div class="text-2xl">🎓</div><h3 class="font-heading font-semibold text-ink mt-2">Trusted by Students</h3><p class="text-sm text-muted mt-1">The go-to choice for A/L, university and professional exams.</p></div>
+    <div class="card border border-line p-5"><div class="text-2xl">🚚</div><h3 class="font-heading font-semibold text-ink mt-2">Islandwide Delivery</h3><p class="text-sm text-muted mt-1">Fast, dependable delivery across Sri Lanka.</p></div>
+  </div>
+
+  <div class="text-center mt-12">
+    <a href="{% url 'products:shop' %}" class="btn-primary">Browse Products</a>
+    <a href="{% url 'contact' %}" class="btn-outline ml-2">Contact Us</a>
+  </div>
+</div>
+{% endblock %}

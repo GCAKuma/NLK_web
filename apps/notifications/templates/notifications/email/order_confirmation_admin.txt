@@ -1,0 +1,18 @@
+{% load humanize %}New order received: {{ order.order_number }}
+
+Customer: {{ order.shipping_full_name }} ({{ order.shipping_phone }})
+Account:  {{ order.user.email }}
+Payment:  {{ order.get_payment_method_display }}
+Status:   {{ order.get_status_display }}
+Total:    Rs. {{ order.total|floatformat:2|intcomma }}
+
+Ship to:
+{{ order.shipping_address_line1 }}
+{% if order.shipping_address_line2 %}{{ order.shipping_address_line2 }}
+{% endif %}{{ order.shipping_city }}, {{ order.shipping_district }} {{ order.shipping_postal_code }}
+
+Items
+-----------------------------------------
+{% for item in order.items.all %}{{ item.quantity }} x {{ item.product_name_snapshot }} — Rs. {{ item.line_total|floatformat:2|intcomma }}
+{% endfor %}
+Manage this order in the admin panel.

@@ -1,0 +1,51 @@
+# syntax=docker/dockerfile:1
+# ---------------------------------------------------------------------------
+# Stage 1 — compile minified Tailwind CSS
+# ---------------------------------------------------------------------------
+FROM node:20-alpine AS frontend
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm install
+# Configs + everything Tailwind scans for class usage
+COPY tailwind.config.js postcss.config.js ./
+COPY static ./static
+COPY apps ./apps
+RUN npm run build:css
+
+# ---------------------------------------------------------------------------
+# Stage 2 — Python production image (Gunicorn, non-root)
+# ---------------------------------------------------------------------------
+FROM python:3.12-slim AS prod
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.prod
+
+WORKDIR /app
+
+# WeasyPrint (invoice PDFs) needs pango/cairo shared libraries.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
+      libgdk-pixbuf-2.0-0 libcairo2 libffi8 shared-mime-info fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt requirements-prod.txt ./
+RUN pip install --upgrade pip && pip install -r requirements-prod.txt
+
+COPY . .
+# Replace any dev CSS with the minified build from stage 1
+COPY --from=frontend /app/static/css/output.css ./static/css/output.css
+
+# Non-root runtime user; own the writable mount points so named volumes inherit it
+RUN adduser --disabled-password --gecos "" appuser \
+    && mkdir -p /app/staticfiles /app/media \
+    && chown -R appuser:appuser /app/staticfiles /app/media
+
+USER appuser
+EXPOSE 8000
+
+CMD ["gunicorn", "config.wsgi:application", \
+     "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "60", \
+     "--access-logfile", "-", "--error-logfile", "-"]

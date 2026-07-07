@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Wholesale & Quotation Requests — NLK{% endblock %}
+
+{% block content %}
+{# Hero #}
+<section class="bg-brand text-white">
+  <div class="mx-auto max-w-7xl px-4 py-14">
+    <h1 class="font-heading font-extrabold text-3xl md:text-4xl max-w-2xl">Wholesale &amp; Institutional Supply</h1>
+    <p class="mt-3 max-w-2xl text-white/70">
+      NLK supplies schools, universities, bookshops and tender suppliers across Sri Lanka
+      with genuine calculators, electronics and educational products at bulk pricing.
+    </p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-7xl px-4 py-12 grid lg:grid-cols-2 gap-10">
+  {# Value props #}
+  <div>
+    <h2 class="font-heading font-bold text-xl text-ink mb-4">Why buy wholesale from NLK</h2>
+    <ul class="space-y-4">
+      <li class="flex gap-3"><span class="text-2xl">💰</span><div><div class="font-medium text-ink">Bulk pricing</div><div class="text-sm text-muted">Competitive rates that scale with your order volume.</div></div></li>
+      <li class="flex gap-3"><span class="text-2xl">📦</span><div><div class="font-medium text-ink">Reliable stock</div><div class="text-sm text-muted">Consistent supply for recurring institutional needs.</div></div></li>
+      <li class="flex gap-3"><span class="text-2xl">🛡️</span><div><div class="font-medium text-ink">Genuine &amp; warrantied</div><div class="text-sm text-muted">Authentic products with full warranty support.</div></div></li>
+      <li class="flex gap-3"><span class="text-2xl">🧾</span><div><div class="font-medium text-ink">Tender &amp; quotation ready</div><div class="text-sm text-muted">Fast, formal quotations for procurement and tenders.</div></div></li>
+    </ul>
+    <div class="mt-8 card border border-line p-5">
+      <p class="text-sm text-muted">Prefer to talk?</p>
+      {% if site_settings.whatsapp_business_number %}
+        <a href="https://wa.me/{{ site_settings.whatsapp_business_number }}?text=Hi%2C%20I%27d%20like%20a%20wholesale%20quotation."
+           target="_blank" rel="noopener" class="btn-whatsapp mt-2">Chat on WhatsApp</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Form #}
+  <div>
+    <div class="card border border-line p-6">
+      <h2 class="font-heading font-bold text-xl text-ink mb-1">Request a Quotation</h2>
+      <p class="text-sm text-muted mb-5">Fill in your details and requirements — we'll get back to you with a quote.</p>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="field-label" for="{{ form.contact_name.id_for_label }}">Contact name</label>
+            {{ form.contact_name }}
+            {% for e in form.contact_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.organization_name.id_for_label }}">Organization name</label>
+            {{ form.organization_name }}
+            {% for e in form.organization_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.organization_type.id_for_label }}">Organization type</label>
+            {{ form.organization_type }}
+            {% for e in form.organization_type.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.phone.id_for_label }}">Phone</label>
+            {{ form.phone }}
+            {% for e in form.phone.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="field-label" for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {% for e in form.email.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="field-label" for="{{ form.requirements.id_for_label }}">Requirements</label>
+            {{ form.requirements }}
+            {% for e in form.requirements.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full">Submit Request</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

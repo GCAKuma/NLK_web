@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}My Account — NLK{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-10">
+
+  {# Header card #}
+  <div class="card border border-line p-6 flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+    <div class="h-16 w-16 rounded-full bg-brand text-white flex items-center justify-center font-heading font-bold text-2xl shrink-0">
+      {{ user.get_short_name|first|upper }}
+    </div>
+    <div class="min-w-0">
+      <h1 class="font-heading font-bold text-xl text-ink truncate">{{ user.full_name|default:"Your account" }}</h1>
+      <p class="text-sm text-muted truncate">{{ user.email }}</p>
+    </div>
+    <div class="sm:ml-auto flex gap-2">
+      <a href="{% url 'orders:list' %}" class="btn-outline">My Orders</a>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-outline text-link">Log out</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    {# Personal details #}
+    <div class="card border border-line p-6">
+      <h2 class="font-heading font-semibold text-ink mb-4">Personal details</h2>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="field-label">Email</label>
+          <input type="email" value="{{ user.email }}" disabled
+                 class="field-input opacity-70 cursor-not-allowed">
+          <p class="text-[11px] text-muted mt-1">Email can't be changed here.</p>
+        </div>
+        <div>
+          <label class="field-label" for="{{ profile_form.full_name.id_for_label }}">Full name</label>
+          {{ profile_form.full_name }}
+          {% for e in profile_form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="field-label" for="{{ profile_form.phone_number.id_for_label }}">Phone number</label>
+          {{ profile_form.phone_number }}
+          {% for e in profile_form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <button type="submit" name="save_profile" class="btn-primary w-full">Save details</button>
+      </form>
+    </div>
+
+    {# Delivery address #}
+    <div class="card border border-line p-6">
+      <h2 class="font-heading font-semibold text-ink mb-4">Delivery address</h2>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-2">
+            <label class="field-label" for="{{ address_form.full_name.id_for_label }}">Recipient name</label>
+            {{ address_form.full_name }}
+            {% for e in address_form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div class="col-span-2">
+            <label class="field-label" for="{{ address_form.phone_number.id_for_label }}">Phone</label>
+            {{ address_form.phone_number }}
+            {% for e in address_form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div class="col-span-2">
+            <label class="field-label" for="{{ address_form.address_line1.id_for_label }}">Address line 1</label>
+            {{ address_form.address_line1 }}
+            {% for e in address_form.address_line1.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div class="col-span-2">
+            <label class="field-label" for="{{ address_form.address_line2.id_for_label }}">Address line 2</label>
+            {{ address_form.address_line2 }}
+          </div>
+          <div>
+            <label class="field-label" for="{{ address_form.city.id_for_label }}">City</label>
+            {{ address_form.city }}
+            {% for e in address_form.city.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ address_form.district.id_for_label }}">District</label>
+            {{ address_form.district }}
+            {% for e in address_form.district.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ address_form.postal_code.id_for_label }}">Postal code</label>
+            {{ address_form.postal_code }}
+          </div>
+        </div>
+        <button type="submit" name="save_address" class="btn-primary w-full">Save address</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

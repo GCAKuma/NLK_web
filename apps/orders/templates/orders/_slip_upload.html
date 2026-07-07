@@ -1,0 +1,19 @@
+{% if proof_form %}
+  <div class="rounded-xl shadow-card border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-5 mt-6">
+    <h3 class="font-heading font-semibold text-amber-900 dark:text-amber-200 mb-2">Upload your bank deposit slip</h3>
+    <p class="text-sm text-amber-800 dark:text-amber-200/80 mb-3">
+      Please deposit the total to our bank account and upload a photo of the slip.
+      We'll verify it and confirm your order.
+    </p>
+    <form method="post" action="{% url 'orders:upload_slip' order.order_number %}" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      {% csrf_token %}
+      {{ proof_form.slip_image }}
+      <button type="submit" class="btn-primary shrink-0">Upload slip</button>
+    </form>
+  </div>
+{% elif order.payment_method == 'bank_deposit' %}
+  <div class="card border border-line p-5 mt-6">
+    <h3 class="font-heading font-semibold text-ink mb-1">Payment slip</h3>
+    <p class="text-sm text-green-700">✓ Slip uploaded — status: {{ order.payment_proof.get_status_display }}. We'll confirm shortly.</p>
+  </div>
+{% endif %}

@@ -1,0 +1,44 @@
+{% load humanize %}
+<div class="grid md:grid-cols-2 gap-6">
+  <div class="card border border-line p-5">
+    <h3 class="font-heading font-semibold text-ink mb-3">Shipping to</h3>
+    <div class="text-sm text-ink space-y-0.5">
+      <div class="font-medium text-ink">{{ order.shipping_full_name }}</div>
+      <div>{{ order.shipping_phone }}</div>
+      <div>{{ order.shipping_address_line1 }}</div>
+      {% if order.shipping_address_line2 %}<div>{{ order.shipping_address_line2 }}</div>{% endif %}
+      <div>{{ order.shipping_city }}, {{ order.shipping_district }} {{ order.shipping_postal_code }}</div>
+    </div>
+    {% if order.customer_notes %}
+      <p class="text-xs text-muted mt-3">Notes: {{ order.customer_notes }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card border border-line p-5">
+    <h3 class="font-heading font-semibold text-ink mb-3">Payment</h3>
+    <p class="text-sm text-ink">{{ order.get_payment_method_display }}</p>
+  </div>
+</div>
+
+<div class="card border border-line mt-6 overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-elevated text-muted text-xs uppercase">
+      <tr><th class="text-left px-4 py-2">Item</th><th class="text-center px-4 py-2">Qty</th><th class="text-right px-4 py-2">Price</th><th class="text-right px-4 py-2">Total</th></tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+        <tr class="border-t border-line">
+          <td class="px-4 py-3 text-ink">{{ item.product_name_snapshot }}{% if item.variant_label_snapshot and item.variant_label_snapshot != 'Default' %}<span class="text-muted"> — {{ item.variant_label_snapshot }}</span>{% endif %}</td>
+          <td class="px-4 py-3 text-center">{{ item.quantity }}</td>
+          <td class="px-4 py-3 text-right">Rs. {{ item.unit_price|floatformat:0|intcomma }}</td>
+          <td class="px-4 py-3 text-right font-medium">Rs. {{ item.line_total|floatformat:0|intcomma }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot class="border-t border-line text-sm">
+      <tr><td colspan="3" class="px-4 py-2 text-right text-muted">Subtotal</td><td class="px-4 py-2 text-right">Rs. {{ order.subtotal|floatformat:0|intcomma }}</td></tr>
+      <tr><td colspan="3" class="px-4 py-2 text-right text-muted">Shipping</td><td class="px-4 py-2 text-right">Rs. {{ order.shipping_fee|floatformat:0|intcomma }}</td></tr>
+      <tr><td colspan="3" class="px-4 py-3 text-right font-semibold text-ink">Total</td><td class="px-4 py-3 text-right font-bold text-ink">Rs. {{ order.total|floatformat:0|intcomma }}</td></tr>
+    </tfoot>
+  </table>
+</div>

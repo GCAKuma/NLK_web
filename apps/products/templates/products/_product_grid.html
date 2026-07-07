@@ -1,0 +1,16 @@
+{% load humanize %}
+<div class="flex items-center justify-between mb-4">
+  <p class="text-sm text-muted">{{ product_count }} product{{ product_count|pluralize }}</p>
+</div>
+{% if products %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    {% for product in products %}
+      {% include "products/_product_card.html" %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-20 text-muted">
+    <div class="text-4xl mb-3">🔍</div>
+    No products match your filters.
+  </div>
+{% endif %}

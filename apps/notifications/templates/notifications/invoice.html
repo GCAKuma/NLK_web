@@ -1,0 +1,98 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 1.6cm; }
+  * { font-family: "DejaVu Sans", sans-serif; }
+  body { color: #1f2937; font-size: 12px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start;
+            border-bottom: 3px solid #0A2342; padding-bottom: 12px; }
+  .brand { font-size: 26px; font-weight: bold; color: #0A2342; }
+  .brand small { display: block; font-size: 10px; color: #6b7280; font-weight: normal; }
+  .accent { color: #FF6B00; }
+  h1 { font-size: 18px; color: #0A2342; margin: 0 0 4px; }
+  .muted { color: #6b7280; }
+  .meta { text-align: right; font-size: 11px; }
+  .cols { display: flex; justify-content: space-between; margin: 20px 0; }
+  .col { width: 48%; }
+  .col h3 { font-size: 11px; text-transform: uppercase; color: #6b7280; margin: 0 0 4px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th { background: #0A2342; color: #fff; text-align: left; padding: 7px 8px; font-size: 11px; }
+  th.r, td.r { text-align: right; }
+  th.c, td.c { text-align: center; }
+  td { padding: 7px 8px; border-bottom: 1px solid #e5e7eb; }
+  .totals { width: 45%; margin-left: 55%; margin-top: 10px; }
+  .totals td { border: none; padding: 4px 8px; }
+  .totals .grand { border-top: 2px solid #0A2342; font-weight: bold; font-size: 14px; color: #0A2342; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 10px; background: #FF6B00; color: #fff; font-size: 11px; }
+  .footer { margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 10px; font-size: 10px; color: #6b7280; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="brand">NLK <small>NugasewanaLK — Your Trusted Choice</small></div>
+    </div>
+    <div class="meta">
+      <h1>INVOICE</h1>
+      <div><strong>{{ invoice_number }}</strong></div>
+      <div class="muted">Order {{ order.order_number }}</div>
+      <div class="muted">{{ order.created_at|date:"d M Y" }}</div>
+      <div style="margin-top:5px"><span class="badge">{{ order.get_status_display }}</span></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Billed / Shipped To</h3>
+      <strong>{{ order.shipping_full_name }}</strong><br>
+      {{ order.shipping_phone }}<br>
+      {{ order.shipping_address_line1 }}<br>
+      {% if order.shipping_address_line2 %}{{ order.shipping_address_line2 }}<br>{% endif %}
+      {{ order.shipping_city }}, {{ order.shipping_district }} {{ order.shipping_postal_code }}
+    </div>
+    <div class="col" style="text-align:right">
+      <h3>From</h3>
+      <strong>NLK (NugasewanaLK)</strong><br>
+      {% if site.contact_address %}{{ site.contact_address }}<br>{% endif %}
+      {% if site.contact_phone %}{{ site.contact_phone }}<br>{% endif %}
+      {% if site.contact_email %}{{ site.contact_email }}{% endif %}
+      <div style="margin-top:8px"><span class="muted">Payment:</span> {{ order.get_payment_method_display }}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th><th class="c">Qty</th><th class="r">Unit Price</th><th class="r">Line Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td>{{ item.product_name_snapshot }}{% if item.variant_label_snapshot and item.variant_label_snapshot != 'Default' %} — {{ item.variant_label_snapshot }}{% endif %}</td>
+          <td class="c">{{ item.quantity }}</td>
+          <td class="r">Rs. {{ item.unit_price|floatformat:2|intcomma }}</td>
+          <td class="r">Rs. {{ item.line_total|floatformat:2|intcomma }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td>Subtotal</td><td class="r">Rs. {{ order.subtotal|floatformat:2|intcomma }}</td></tr>
+    <tr><td>Shipping</td><td class="r">Rs. {{ order.shipping_fee|floatformat:2|intcomma }}</td></tr>
+    <tr class="grand"><td>Total</td><td class="r">Rs. {{ order.total|floatformat:2|intcomma }}</td></tr>
+  </table>
+
+  {% if order.customer_notes %}
+    <p style="margin-top:20px"><span class="muted">Notes:</span> {{ order.customer_notes }}</p>
+  {% endif %}
+
+  <div class="footer">
+    Thank you for shopping with NLK (NugasewanaLK). Genuine products · Warranty support · Islandwide delivery.
+  </div>
+</body>
+</html>

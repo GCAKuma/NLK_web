@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Contact Us — NLK{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-12">
+  <h1 class="font-heading font-extrabold text-3xl text-ink">Contact Us</h1>
+  <p class="text-muted mt-2">We're here to help — reach us on any channel below.</p>
+
+  <div class="grid sm:grid-cols-2 gap-5 mt-8">
+    {% if site_settings.whatsapp_business_number %}
+      <a href="https://wa.me/{{ site_settings.whatsapp_business_number }}" target="_blank" rel="noopener" class="card border border-line p-6 hover:shadow-card-hover transition flex items-center gap-4">
+        <span class="text-3xl">💬</span><div><div class="font-medium text-ink">WhatsApp</div><div class="text-sm text-muted">Chat with us now</div></div>
+      </a>
+    {% endif %}
+    {% if site_settings.messenger_url %}
+      <a href="{{ site_settings.messenger_url }}" target="_blank" rel="noopener" class="card border border-line p-6 hover:shadow-card-hover transition flex items-center gap-4">
+        <span class="text-3xl">📨</span><div><div class="font-medium text-ink">Messenger</div><div class="text-sm text-muted">Message us on Facebook</div></div>
+      </a>
+    {% endif %}
+    {% if site_settings.contact_phone %}
+      <a href="tel:{{ site_settings.contact_phone }}" class="card border border-line p-6 hover:shadow-card-hover transition flex items-center gap-4">
+        <span class="text-3xl">📞</span><div><div class="font-medium text-ink">Phone</div><div class="text-sm text-muted">{{ site_settings.contact_phone }}</div></div>
+      </a>
+    {% endif %}
+    {% if site_settings.contact_email %}
+      <a href="mailto:{{ site_settings.contact_email }}" class="card border border-line p-6 hover:shadow-card-hover transition flex items-center gap-4">
+        <span class="text-3xl">✉️</span><div><div class="font-medium text-ink">Email</div><div class="text-sm text-muted">{{ site_settings.contact_email }}</div></div>
+      </a>
+    {% endif %}
+  </div>
+
+  {% if site_settings.contact_address %}
+    <div class="card border border-line p-6 mt-5 flex items-start gap-4">
+      <span class="text-3xl">📍</span><div><div class="font-medium text-ink">Location</div><div class="text-sm text-muted">{{ site_settings.contact_address }}</div></div>
+    </div>
+  {% endif %}
+
+  {% if site_settings.facebook_url or site_settings.tiktok_url or site_settings.instagram_url or site_settings.youtube_url %}
+    <div class="mt-8">
+      <h2 class="font-heading font-semibold text-ink mb-3">Follow us</h2>
+      <div class="flex flex-wrap gap-3 text-sm">
+        {% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener" class="btn-outline">Facebook</a>{% endif %}
+        {% if site_settings.tiktok_url %}<a href="{{ site_settings.tiktok_url }}" target="_blank" rel="noopener" class="btn-outline">TikTok</a>{% endif %}
+        {% if site_settings.instagram_url %}<a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener" class="btn-outline">Instagram</a>{% endif %}
+        {% if site_settings.youtube_url %}<a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener" class="btn-outline">YouTube</a>{% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

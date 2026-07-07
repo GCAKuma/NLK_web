@@ -1,0 +1,15 @@
+{% if selected %}
+  {% if recommendations %}
+    <h2 class="font-heading font-bold text-xl text-ink mb-4">Our recommendation</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {% for rec in recommendations %}
+        {% with product=rec.recommended_product %}
+          {% include "products/_product_card.html" %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No recommendation set for this option yet. Please browse our
+      <a href="{% url 'products:category' 'calculators' %}" class="text-link underline">calculators</a>.</p>
+  {% endif %}
+{% endif %}

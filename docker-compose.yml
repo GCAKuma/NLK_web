@@ -1,0 +1,79 @@
+# Dev stack: web (Django) + db (Postgres) + redis + celery worker + tailwind CSS watcher.
+# Start everything with:  docker compose up --build
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      args:
+        DEV: "true"
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery:
+    build:
+      context: .
+      args:
+        DEV: "true"
+    command: celery -A config worker -l info
+    volumes:
+      - .:/app
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  tailwind:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run watch:css"
+    # Bind-mount file events don't propagate reliably on Windows/Docker, so the
+    # Tailwind watcher polls for template changes instead.
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "600"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    tty: true
+
+volumes:
+  pgdata:
+  node_modules:

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Calculator Finder — NLK{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-4 py-10">
+  <div class="text-center mb-8">
+    <h1 class="font-heading font-extrabold text-3xl text-ink">Find Your Calculator</h1>
+    <p class="text-muted mt-2">Tell us who you are and we'll recommend the right calculator.</p>
+  </div>
+
+  <div class="card border border-line p-6">
+    <p class="field-label mb-3">I am a…</p>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {% for value, label in student_types %}
+        <button
+          hx-get="{% url 'products:calculator_finder' %}?type={{ value }}"
+          hx-target="#finder-result" hx-swap="innerHTML" hx-push-url="true"
+          class="px-4 py-4 rounded-lg border text-sm font-medium transition
+                 {% if selected == value %}border-accent text-link bg-accent/10{% else %}border-line text-ink hover:border-accent{% endif %}">
+          {{ label }}
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="finder-result" class="mt-8">
+    {% include "products/_finder_result.html" %}
+  </div>
+</div>
+{% endblock %}

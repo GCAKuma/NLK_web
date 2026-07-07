@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Checkout — NLK{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8">
+  <h1 class="font-heading font-bold text-2xl text-ink mb-6">Checkout</h1>
+
+  <form method="post" class="grid lg:grid-cols-3 gap-6">
+    {% csrf_token %}
+
+    {# Left: address + payment #}
+    <div class="lg:col-span-2 space-y-6">
+      <div class="card border border-line p-5">
+        <h2 class="font-heading font-semibold text-ink mb-4">Shipping Address</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="field-label" for="{{ form.full_name.id_for_label }}">Full name</label>
+            {{ form.full_name }}
+            {% for e in form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.phone_number.id_for_label }}">Phone number</label>
+            {{ form.phone_number }}
+            {% for e in form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.postal_code.id_for_label }}">Postal code</label>
+            {{ form.postal_code }}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="field-label" for="{{ form.address_line1.id_for_label }}">Address line 1</label>
+            {{ form.address_line1 }}
+            {% for e in form.address_line1.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div class="sm:col-span-2">
+            <label class="field-label" for="{{ form.address_line2.id_for_label }}">Address line 2 (optional)</label>
+            {{ form.address_line2 }}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.city.id_for_label }}">City</label>
+            {{ form.city }}
+            {% for e in form.city.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+          <div>
+            <label class="field-label" for="{{ form.district.id_for_label }}">District</label>
+            {{ form.district }}
+            {% for e in form.district.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="card border border-line p-5">
+        <h2 class="font-heading font-semibold text-ink mb-4">Payment Method</h2>
+        <div class="space-y-3">
+          {% for radio in form.payment_method %}
+            <label class="flex items-start gap-3 border border-line rounded-lg p-3 cursor-pointer hover:border-accent">
+              {{ radio.tag }}
+              <span>
+                <span class="font-medium text-ink">{{ radio.choice_label }}</span>
+                <span class="block text-xs text-muted">
+                  {% if 'Cash' in radio.choice_label %}Pay in cash when your order is delivered.{% else %}Deposit to our bank account and upload the slip after placing the order.{% endif %}
+                </span>
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+        {% for e in form.payment_method.errors %}<p class="text-xs text-red-600 mt-2">{{ e }}</p>{% endfor %}
+
+        <div class="mt-4">
+          <label class="field-label" for="{{ form.customer_notes.id_for_label }}">Order notes (optional)</label>
+          {{ form.customer_notes }}
+        </div>
+      </div>
+    </div>
+
+    {# Right: summary #}
+    <div class="lg:col-span-1">
+      <div class="card border border-line p-5 sticky top-24">
+        <h2 class="font-heading font-semibold text-ink mb-4">Order Summary</h2>
+        <div class="space-y-2 text-sm max-h-56 overflow-auto mb-3">
+          {% for item in items %}
+            <div class="flex justify-between gap-2">
+              <span class="text-ink truncate">{{ item.quantity }} × {{ item.product_variant.product.name }}</span>
+              <span class="font-medium whitespace-nowrap">Rs. {{ item.line_total|floatformat:0|intcomma }}</span>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="border-t border-line pt-3 space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-muted">Subtotal</span><span>Rs. {{ subtotal|floatformat:0|intcomma }}</span></div>
+          <div class="flex justify-between"><span class="text-muted">Shipping</span><span>Rs. {{ shipping_fee|floatformat:0|intcomma }}</span></div>
+          <div class="flex justify-between text-base border-t border-line pt-2">
+            <span class="font-semibold text-ink">Total</span>
+            <span class="font-bold text-ink">Rs. {{ total|floatformat:0|intcomma }}</span>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full mt-5">Place Order</button>
+        <p class="text-[11px] text-muted mt-2 text-center">No online payment — Cash on Delivery or bank deposit.</p>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Palette — semantic tokens as RGB channel triplets.
+   Light + dark (.dark) values. Electric cyan is reserved for fills/accents;
+   readable link text uses a darker cyan on light and a bright cyan on dark.
+--------------------------------------------------------------------------- */
+:root {
+  --c-page: 247 249 252;      /* #F7F9FC */
+  --c-surface: 255 255 255;   /* #FFFFFF */
+  --c-elevated: 238 242 247;  /* #EEF2F7 */
+  --c-ink: 15 23 42;          /* #0F172A */
+  --c-muted: 100 116 139;     /* #64748B */
+  --c-line: 226 232 240;      /* #E2E8F0 */
+  --c-brand: 7 26 47;         /* #071A2F Midnight Navy */
+  --c-brand-2: 18 38 63;      /* #12263F Slate Navy */
+  --c-accent: 0 217 255;      /* #00D9FF Electric Cyan */
+  --c-accent-ink: 7 26 47;    /* navy text on cyan */
+  --c-link: 14 116 144;       /* #0E7490 readable cyan on light */
+}
+
+.dark {
+  --c-page: 7 26 47;          /* #071A2F */
+  --c-surface: 18 38 63;      /* #12263F */
+  --c-elevated: 27 51 82;     /* #1B3352 */
+  --c-ink: 226 232 240;       /* #E2E8F0 */
+  --c-muted: 148 163 184;     /* #94A3B8 */
+  --c-line: 34 55 79;         /* #22374F */
+  --c-brand: 7 26 47;
+  --c-brand-2: 18 38 63;
+  --c-accent: 0 217 255;
+  --c-accent-ink: 7 26 47;
+  --c-link: 90 227 255;       /* bright cyan on dark */
+}
+
+@layer base {
+  html {
+    font-family: "Inter", "Poppins", ui-sans-serif, system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  }
+  body {
+    @apply bg-page text-ink antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  ::selection {
+    background-color: rgb(var(--c-accent) / 0.25);
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5
+           text-sm font-semibold transition focus:outline-none
+           focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2
+           focus-visible:ring-offset-page disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  /* Primary CTA — electric cyan with navy text (the visual "pop") */
+  .btn-primary {
+    @apply btn bg-accent text-accent-ink hover:bg-accent/90;
+  }
+  /* Secondary — solid navy */
+  .btn-secondary {
+    @apply btn bg-brand text-white hover:bg-brand-2 border border-transparent
+           dark:border-line;
+  }
+  .btn-outline {
+    @apply btn border border-line bg-surface text-ink hover:border-accent
+           hover:text-link;
+  }
+  .btn-whatsapp {
+    @apply btn bg-[#25D366] text-white hover:brightness-95
+           focus-visible:ring-[#25D366];
+  }
+
+  .card {
+    @apply bg-surface rounded-xl shadow-card;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-ink mb-1;
+  }
+  .field-input {
+    @apply block w-full rounded-lg border-line bg-surface text-ink
+           placeholder:text-muted shadow-sm text-sm
+           focus:border-accent focus:ring-accent;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full bg-accent text-accent-ink
+           text-[10px] font-bold px-2 py-0.5;
+  }
+  /* Selectable pill (category filters, quiz options) */
+  .chip {
+    @apply px-4 py-1.5 rounded-full text-sm font-medium border border-line
+           bg-surface text-ink hover:border-accent transition;
+  }
+  .chip-active {
+    @apply border-brand bg-brand text-white hover:border-brand;
+  }
+}

@@ -1,0 +1,24 @@
+{% load humanize %}Hi {{ order.shipping_full_name }},
+
+Thank you for your order with NLK (NugasewanaLK)!
+
+Order number: {{ order.order_number }}
+Status: {{ order.get_status_display }}
+Payment method: {{ order.get_payment_method_display }}
+
+Items
+-----------------------------------------
+{% for item in order.items.all %}{{ item.quantity }} x {{ item.product_name_snapshot }}{% if item.variant_label_snapshot and item.variant_label_snapshot != 'Default' %} ({{ item.variant_label_snapshot }}){% endif %} — Rs. {{ item.line_total|floatformat:2|intcomma }}
+{% endfor %}-----------------------------------------
+Subtotal: Rs. {{ order.subtotal|floatformat:2|intcomma }}
+Shipping: Rs. {{ order.shipping_fee|floatformat:2|intcomma }}
+Total:    Rs. {{ order.total|floatformat:2|intcomma }}
+{% if order.payment_method == 'bank_deposit' %}
+IMPORTANT: Please deposit the total to our bank account and upload your slip
+in your account so we can verify and confirm your order.
+{% endif %}
+Your invoice is attached to this email.
+
+We'll be in touch as your order progresses. Thank you for choosing NLK!
+
+— NLK (NugasewanaLK)

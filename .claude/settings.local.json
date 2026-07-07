@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py --version)",
+      "Bash(docker --version)",
+      "Bash(git --version)"
+    ]
+  }
+}
