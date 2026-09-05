@@ -31,7 +31,7 @@ ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 # Applications
 # ---------------------------------------------------------------------------
 DJANGO_APPS = [
-    "django.contrib.admin",
+    "core.admin_apps.NLKAdminConfig",  # replaces django.contrib.admin (adds dashboard)
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

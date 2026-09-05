@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('NLK Admin') }}{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+  <a href="{% url 'admin:index' %}">{{ site_header|default:_('NLK Control Panel') }}</a>
+</div>
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  :root {
+    --primary: #0a2342;
+    --secondary: #071A2F;
+    --accent: #00D9FF;
+    --link-fg: #0e7490;
+    --link-hover-color: #0891b2;
+    --header-color: #ffffff;
+    --header-branding-color: #ffffff;
+    --breadcrumbs-fg: #cbd5e1;
+    --default-button-bg: #0e7490;
+    --button-bg: #0e7490;
+    --button-hover-bg: #0a5f77;
+  }
+  #site-name a:link, #site-name a:visited { color: #fff; }
+</style>
+{% endblock %}
