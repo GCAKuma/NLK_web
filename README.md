@@ -124,14 +124,61 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod exec web \
     python manage.py createsuperuser
 ```
 
-- **HTTPS** — uncomment the `443` server block in `nginx/default.conf` and the
-  HTTP→HTTPS redirect, mount certs at `nginx/certs/`, and keep
-  `SECURE_SSL_REDIRECT=True` / `SECURE_HSTS_SECONDS=31536000` in `.env.prod`.
 - **Object storage** — set `USE_S3=True` plus the `AWS_*` vars to move media to
   S3 / Cloudflare R2 / DO Spaces (`django-storages` is installed in the prod image).
 - **Hardening in place** — `DEBUG=False`, secure + HTTP-only cookies, HSTS,
   `X-Frame-Options: DENY`, nosniff, referrer-policy, `SECURE_PROXY_SSL_HEADER`.
   Verify anytime with `manage.py check --deploy`.
+
+### Enable HTTPS (once DNS points at the server)
+
+The stack ships on plain HTTP so it runs without a domain. Once your domain's
+A record points at the server:
+
+```bash
+# 1. Bring the stack up on HTTP first (needed for the ACME challenge below)
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+
+# 2. Issue the certificate (replace the domain; --staging first to avoid
+#    Let's Encrypt's rate limit while testing, then drop it for the real cert)
+docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm certbot \
+  certonly --webroot -w /var/www/certbot -d nugasewana.lk -d www.nugasewana.lk
+
+# 3. Uncomment the HTTPS server block in nginx/default.conf (fill in your
+#    domain) and the `return 301 https://...` redirect in the HTTP block
+
+# 4. Reload nginx with the new config
+docker compose -f docker-compose.prod.yml --env-file .env.prod restart nginx
+```
+
+The `certbot` service in `docker-compose.prod.yml` then renews automatically
+every 12h in the background — nothing further to schedule.
+
+### Error monitoring
+
+Set `SENTRY_DSN` in `.env.prod` (free tier at sentry.io) and Django/Celery
+exceptions report there automatically — see `config/settings/prod.py`.
+Leaving it blank keeps Sentry fully inert.
+
+### Database backups
+
+`deploy/backup.sh` runs `pg_dump` against the `db` container and gzips the
+result to `./backups/`. Run it on the **host**, not in a container:
+
+```bash
+0 2 * * * /opt/nlk/deploy/backup.sh >> /var/log/nlk-backup.log 2>&1   # crontab -e
+```
+
+Set `BACKUP_TO_S3=true` in `.env.prod` to also push each backup to your
+S3/R2 bucket. Local backups older than 14 days are pruned automatically.
+
+### Email deliverability
+
+Set real SMTP credentials (`EMAIL_BACKEND`, `EMAIL_HOST*`) in `.env.prod`,
+and add **SPF, DKIM, and DMARC** DNS records for your domain at your
+registrar/DNS provider — without them, order-confirmation emails routinely
+land in spam. Your SMTP provider (SES, SendGrid, Mailgun) gives you the exact
+DKIM record to add when you create the sending domain there.
 
 ## Status
 

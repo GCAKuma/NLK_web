@@ -33,7 +33,7 @@ class Order(TimeStampedModel):
         max_length=32, unique=True, default=generate_order_number, editable=False
     )
     status = models.CharField(
-        max_length=30, choices=Status.choices, default=Status.PENDING
+        max_length=30, choices=Status.choices, default=Status.PENDING, db_index=True
     )
     payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices)
 
@@ -117,7 +117,7 @@ class PaymentProof(TimeStampedModel):
     )
     slip_image = models.ImageField(upload_to="payment_slips/")
     status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
+        max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True
     )
     verified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

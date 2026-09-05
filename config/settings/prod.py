@@ -52,6 +52,29 @@ if env.bool("USE_S3", default=False):
     STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 
 # ---------------------------------------------------------------------------
+# Error monitoring — set SENTRY_DSN to enable (free tier is fine to start).
+# Leaving it blank keeps Sentry fully inert; no code path depends on it.
+# ---------------------------------------------------------------------------
+SENTRY_DSN = env("SENTRY_DSN", default="")
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        environment=env("SENTRY_ENVIRONMENT", default="production"),
+        integrations=[
+            DjangoIntegration(),
+            CeleryIntegration(),
+            LoggingIntegration(level=None, event_level="ERROR"),
+        ],
+        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.1),
+        send_default_pii=False,  # don't ship customer emails/addresses to Sentry
+    )
+
+# ---------------------------------------------------------------------------
 # Logging — everything to stdout for the container runtime to collect.
 # ---------------------------------------------------------------------------
 LOGGING = {

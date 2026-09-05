@@ -57,7 +57,7 @@ class Product(TimeStampedModel):
     is_featured = models.BooleanField(
         default=False, help_text="Show in the Best Sellers section."
     )
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -160,7 +160,7 @@ class ProductQuestion(TimeStampedModel):
     )
     answered_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
+        max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True
     )
     display_order = models.PositiveIntegerField(default=0)
 
@@ -214,7 +214,7 @@ class ProductVariant(TimeStampedModel):
     sku = models.CharField(max_length=64, unique=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock_quantity = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     attribute_values = models.ManyToManyField(
         AttributeValue,
         through="VariantAttributeValue",

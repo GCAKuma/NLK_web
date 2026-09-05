@@ -2,3 +2,6 @@
 
 # Object storage (S3 / Cloudflare R2 / DigitalOcean Spaces) — used when USE_S3=True
 django-storages[boto3]>=1.14
+
+# Error monitoring — active only when SENTRY_DSN is set in .env.prod
+sentry-sdk>=2.0

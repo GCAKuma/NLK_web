@@ -124,7 +124,7 @@ class ProductQuestionAdmin(admin.ModelAdmin):
     search_fields = ("question", "answer", "product__name", "asker_name", "asked_by__email")
     autocomplete_fields = ("product",)
     readonly_fields = ("asked_by", "answered_by", "answered_at", "created_at")
-    actions = ["publish_questions"]
+    actions = ["publish_questions", "reject_questions"]
     fields = (
         "product", "asked_by", "asker_name", "question",
         "answer", "status", "display_order",
@@ -156,6 +156,11 @@ class ProductQuestionAdmin(admin.ModelAdmin):
             status=ProductQuestion.Status.PUBLISHED
         )
         self.message_user(request, f"{updated} question(s) published.")
+
+    @admin.action(description="Reject selected questions")
+    def reject_questions(self, request, queryset):
+        updated = queryset.update(status=ProductQuestion.Status.REJECTED)
+        self.message_user(request, f"{updated} question(s) rejected.")
 
 
 @admin.register(CalculatorRecommendation)

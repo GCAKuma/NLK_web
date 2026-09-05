@@ -1,10 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Min, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .models import AttributeValue, Category, Product, ProductQuestion
+
+PRODUCTS_PER_PAGE = 24
 
 
 def product_list(request, category_slug=None):
@@ -73,11 +76,20 @@ def product_list(request, category_slug=None):
         .order_by("attribute__name", "value")
     )
 
+    # --- pagination (catalog can grow well past a single page) ---
+    paginator = Paginator(products, PRODUCTS_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    querystring = request.GET.copy()
+    querystring.pop("page", None)
+
     context = {
-        "products": products,
+        "products": page_obj,
+        "page_obj": page_obj,
+        "querystring": querystring.urlencode(),
         "category": category,
         "categories": Category.objects.filter(is_active=True, parent__isnull=True),
-        "product_count": products.count(),
+        "product_count": paginator.count,
         "brands": brands,
         "attribute_values": attribute_values,
         "q": q,

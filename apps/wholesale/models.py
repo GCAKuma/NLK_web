@@ -28,7 +28,7 @@ class QuotationRequest(TimeStampedModel):
     phone = models.CharField(max_length=20)
     requirements = models.TextField(help_text="Items or requirements requested.")
     status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.NEW
+        max_length=20, choices=Status.choices, default=Status.NEW, db_index=True
     )
 
     class Meta:
