@@ -130,6 +130,10 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod exec web \
   `X-Frame-Options: DENY`, nosniff, referrer-policy, `SECURE_PROXY_SSL_HEADER`.
   Verify anytime with `manage.py check --deploy`.
 
+Deploying to AWS specifically for an evaluation period? See
+[docs/deploy-aws.md](docs/deploy-aws.md) for the EC2 + Elastic IP + DNS
+walkthrough — same stack below, just naming AWS's specific screens.
+
 ### Enable HTTPS (once DNS points at the server)
 
 The stack ships on plain HTTP so it runs without a domain. Once your domain's

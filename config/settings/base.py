@@ -157,6 +157,13 @@ EMAIL_BACKEND = env(
     "EMAIL_BACKEND",
     default="django.core.mail.backends.console.EmailBackend",
 )
+# Only read when EMAIL_BACKEND is switched to the SMTP backend (e.g. Amazon
+# SES) — harmless defaults otherwise, since the console backend ignores them.
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="NLK <no-reply@nugasewana.lk>")
 ADMIN_EMAIL = env("ADMIN_EMAIL", default="admin@nugasewana.lk")
 
