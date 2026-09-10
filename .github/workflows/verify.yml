@@ -1,0 +1,21 @@
+name: Verify production release
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test with isolated PostgreSQL
+        run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+      - name: Check migration consistency
+        run: docker compose -f docker-compose.test.yml run --rm tests python manage.py makemigrations --check --dry-run
+      - name: Check shell scripts
+        run: for script in deploy/*.sh; do sh -n "$script"; done
+      - name: Clean up test services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down --volumes

@@ -75,6 +75,12 @@ class Product(TimeStampedModel):
 
     @property
     def primary_image(self):
+        cached = getattr(self, "_prefetched_objects_cache", {}).get("images")
+        if cached is not None:
+            images = list(cached)
+            img = next((image for image in images if image.is_primary), None)
+            img = img or (images[0] if images else None)
+            return img.image if img else self.thumbnail or None
         img = self.images.filter(is_primary=True).first() or self.images.first()
         if img:
             return img.image
@@ -82,6 +88,9 @@ class Product(TimeStampedModel):
 
     @property
     def default_variant(self):
+        cached = getattr(self, "_prefetched_objects_cache", {}).get("variants")
+        if cached is not None:
+            return min((v for v in cached if v.is_active), key=lambda v: (v.price, v.pk), default=None)
         return self.variants.filter(is_active=True).order_by("price").first()
 
     @property
@@ -91,6 +100,9 @@ class Product(TimeStampedModel):
 
     @property
     def in_stock(self):
+        cached = getattr(self, "_prefetched_objects_cache", {}).get("variants")
+        if cached is not None:
+            return any(v.is_active and v.stock_quantity > 0 for v in cached)
         return self.variants.filter(is_active=True, stock_quantity__gt=0).exists()
 
 

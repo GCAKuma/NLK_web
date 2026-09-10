@@ -46,60 +46,23 @@ def generate_invoice(self, order_id: int):
     return {"order_id": order_id, "status": "generated"}
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=30)
-def send_order_emails(self, order_id: int):
-    """Email order confirmation + invoice to the customer and admin (idempotent)."""
-    from orders.models import Order
+@shared_task
+def process_notification_job(job_id):
+    from .outbox import process_job
+    return process_job(job_id)
 
-    try:
-        order = Order.objects.select_related("user").get(id=order_id)
-    except Order.DoesNotExist:
-        logger.warning("send_order_emails: order %s not found", order_id)
-        return {"order_id": order_id, "status": "missing"}
 
-    invoice = getattr(order, "invoice", None)
-    if invoice and invoice.emailed_at:
-        return {"order_id": order_id, "status": "already_emailed"}
-
-    customer_body = render_to_string(
-        "notifications/email/order_confirmation_customer.txt", {"order": order}
-    )
-    admin_body = render_to_string(
-        "notifications/email/order_confirmation_admin.txt", {"order": order}
-    )
-    from_email = settings.DEFAULT_FROM_EMAIL
-
-    customer_email = EmailMessage(
-        f"Your NLK order {order.order_number}",
-        customer_body, from_email, [order.user.email],
-    )
-    admin_email = EmailMessage(
-        f"New order {order.order_number}",
-        admin_body, from_email, [settings.ADMIN_EMAIL],
-    )
-
-    if invoice and invoice.pdf_file:
-        try:
-            invoice.pdf_file.open("rb")
-            pdf_data = invoice.pdf_file.read()
-            invoice.pdf_file.close()
-            attachment = (f"{invoice.invoice_number}.pdf", pdf_data, "application/pdf")
-            customer_email.attach(*attachment)
-            admin_email.attach(*attachment)
-        except Exception:
-            logger.exception("Could not attach invoice for order %s", order_id)
-
-    try:
-        customer_email.send(fail_silently=False)
-        admin_email.send(fail_silently=False)
-    except Exception as exc:
-        logger.exception("Order emails failed for order %s", order_id)
-        raise self.retry(exc=exc)
-
-    if invoice:
-        invoice.emailed_at = timezone.now()
-        invoice.save(update_fields=["emailed_at"])
-    return {"order_id": order_id, "status": "emailed"}
+@shared_task
+def send_order_emails(order_id: int):
+    """Compatibility entry point; independent recipient jobs prevent repeat sends."""
+    from .outbox import enqueue_order, process_job
+    from .models import NotificationJob
+    enqueue_order(order_id)
+    invoice_job = NotificationJob.objects.get(key=f"invoice:{order_id}")
+    process_job(invoice_job.pk)
+    for kind in ("customer_email", "admin_email"):
+        process_job(NotificationJob.objects.get(key=f"{kind}:{order_id}").pk)
+    return {"order_id": order_id, "status": "processed"}
 
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=30)
@@ -151,9 +114,9 @@ def send_quotation_alert(self, quotation_id: int):
 
     number = SiteSettings.get_solo().admin_notification_whatsapp_number
     message = (
-        f"📄 New wholesale quotation\n"
+        f"ðŸ“„ New wholesale quotation\n"
         f"Org: {q.organization_name} ({q.get_organization_type_display()})\n"
-        f"Contact: {q.contact_name} · {q.phone}"
+        f"Contact: {q.contact_name} Â· {q.phone}"
     )
     try:
         get_whatsapp_provider().send(number, message)

@@ -76,7 +76,13 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        # Project overrides must precede django.contrib.admin's registration
+        # and base_site templates during template discovery.
+        "DIRS": [
+            BASE_DIR / "templates",
+            BASE_DIR / "apps" / "core" / "templates",
+            BASE_DIR / "apps" / "accounts" / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -137,6 +143,11 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    "private": {"BACKEND": "core.storage.PrivateFileSystemStorage"},
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -177,6 +188,14 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_SOFT_TIME_LIMIT = 120
+CELERY_TASK_TIME_LIMIT = 150
+CELERY_BROKER_CONNECTION_TIMEOUT = 5
+CELERY_TASK_PUBLISH_RETRY = False
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+NOTIFICATION_MAX_ATTEMPTS = 8
+EMAIL_TIMEOUT = 20
 
 # ---------------------------------------------------------------------------
 # WhatsApp admin-alert provider (swappable service)

@@ -5,19 +5,20 @@
 <div class="mx-auto max-w-7xl px-4 py-8">
 
   {# Breadcrumb #}
-  <nav class="text-xs text-muted mb-4">
+  <nav aria-label="Breadcrumb" class="text-sm text-muted mb-4">
     <a href="{% url 'home' %}" class="hover:text-link">Home</a>
     <span class="mx-1">/</span>
     <a href="{% url 'products:shop' %}" class="hover:text-link">Shop</a>
     {% if category %}<span class="mx-1">/</span><span class="text-ink">{{ category.name }}</span>{% endif %}
   </nav>
 
-  <h1 class="font-heading font-bold text-2xl text-ink">
+  <p class="eyebrow mb-2">Find your everyday</p>
+  <h1 class="font-heading font-semibold text-3xl md:text-4xl text-ink">
     {% if category %}{{ category.name }}{% elif q %}Results for “{{ q }}”{% else %}All Products{% endif %}
   </h1>
 
   {# Category pills (full-page nav) #}
-  <div class="flex flex-wrap gap-2 mt-5 mb-7">
+  <div class="category-pills" aria-label="Product categories">
     <a href="{% url 'products:shop' %}"
        class="px-4 py-1.5 rounded-full text-sm font-medium border {% if not category %}bg-brand text-white border-brand{% else %}bg-surface text-ink border-line hover:border-accent{% endif %}">All</a>
     {% for cat in categories %}
@@ -28,19 +29,20 @@
 
   <div class="grid lg:grid-cols-4 gap-6">
     {# ---------- Filters sidebar ---------- #}
-    <aside class="lg:col-span-1" x-data="{ open: false }">
-      <button @click="open = !open" class="lg:hidden btn-outline w-full mb-3">
+    <aside class="lg:col-span-1 min-w-0" x-data="{ open: false }">
+      <button @click="open = !open" :aria-expanded="open" aria-controls="catalog-filters" class="lg:hidden btn-outline w-full mb-3">
         Filters &amp; Sort
       </button>
-      <form :class="open ? 'block' : 'hidden lg:block'"
+      <form id="catalog-filters" method="get" :class="open ? 'block' : 'hidden lg:block'"
             hx-get="{{ request.path }}" hx-target="#product-grid" hx-swap="innerHTML"
             hx-trigger="change, submit" hx-push-url="true"
-            class="card border border-line p-4 space-y-5 text-sm">
+            hx-indicator="#catalog-loading" class="catalog-filter space-y-5 text-sm">
+        <h2 class="font-semibold text-lg">Refine your search</h2>
         {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
 
         <div>
-          <label class="field-label">Sort by</label>
-          <select name="sort" class="field-input">
+          <label for="catalog-sort" class="field-label">Sort by</label>
+          <select id="catalog-sort" name="sort" class="field-input">
             <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
             <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
             <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
@@ -96,8 +98,11 @@
     </aside>
 
     {# ---------- Product grid ---------- #}
-    <div id="product-grid" class="lg:col-span-3">
+    <div class="lg:col-span-3 min-w-0">
+      <p id="catalog-loading" role="status" class="request-indicator mb-3">Updating products…</p>
+      <div id="product-grid" aria-live="polite">
       {% include "products/_product_grid.html" %}
+      </div>
     </div>
   </div>
 </div>

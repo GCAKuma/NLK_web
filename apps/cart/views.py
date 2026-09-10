@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -36,9 +37,12 @@ def cart_detail(request):
 
 @require_POST
 @login_required
+@transaction.atomic
 def add_to_cart(request):
+    cart = get_user_cart(request.user)
+    cart = Cart.objects.select_for_update().get(pk=cart.pk)
     variant = get_object_or_404(
-        ProductVariant, id=request.POST.get("variant_id"), is_active=True
+        ProductVariant.objects.select_for_update(), id=request.POST.get("variant_id"), is_active=True, product__is_active=True
     )
     try:
         qty = int(request.POST.get("quantity", 1))
@@ -50,7 +54,6 @@ def add_to_cart(request):
         messages.error(request, f"{variant.product.name} is out of stock.")
         return redirect(variant.product.get_absolute_url())
 
-    cart = get_user_cart(request.user)
     existing = CartItem.objects.filter(cart=cart, product_variant=variant).first()
     current_qty = existing.quantity if existing else 0
     new_qty = current_qty + qty
@@ -70,8 +73,10 @@ def add_to_cart(request):
 
 @require_POST
 @login_required
+@transaction.atomic
 def update_item(request, item_id):
     cart = get_user_cart(request.user)
+    cart = Cart.objects.select_for_update().get(pk=cart.pk)
     item = get_object_or_404(CartItem, id=item_id, cart=cart)
     try:
         qty = int(request.POST.get("quantity", 1))
@@ -85,15 +90,20 @@ def update_item(request, item_id):
         if qty > item.product_variant.stock_quantity:
             qty = item.product_variant.stock_quantity
             messages.warning(request, "Quantity adjusted to available stock.")
-        item.quantity = qty
-        item.save()
+        if qty < 1:
+            item.delete()
+        else:
+            item.quantity = qty
+            item.save()
     return redirect("cart:detail")
 
 
 @require_POST
 @login_required
+@transaction.atomic
 def remove_item(request, item_id):
     cart = get_user_cart(request.user)
+    cart = Cart.objects.select_for_update().get(pk=cart.pk)
     CartItem.objects.filter(id=item_id, cart=cart).delete()
     messages.success(request, "Item removed from cart.")
     return redirect("cart:detail")

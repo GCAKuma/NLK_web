@@ -3,33 +3,27 @@
 
 {% block content %}
 <section class="mx-auto max-w-md px-4 py-12">
-  <div class="card border border-line p-8">
-    <h1 class="font-heading font-bold text-2xl text-ink">Log in</h1>
+  <div class="card border border-line p-5 sm:p-8">
+    <h1 class="font-heading font-semibold text-3xl text-ink">Log in</h1>
     <p class="text-sm text-muted mt-1 mb-6">Welcome back to NLK.</p>
 
-    {% if form.non_field_errors %}
-      <div class="rounded-lg bg-red-50 text-red-700 text-sm px-4 py-3 mb-4">
-        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-      </div>
-    {% endif %}
-
-    <form method="post" class="space-y-4">
+    {% include "components/form_errors.html" %}<form method="post" class="space-y-4">
       {% csrf_token %}
       <div>
         <label class="field-label" for="{{ form.username.id_for_label }}">Email</label>
         {{ form.username }}
-        {% for e in form.username.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+        {% for e in form.username.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
       </div>
       <div>
         <label class="field-label" for="{{ form.password.id_for_label }}">Password</label>
         {{ form.password }}
-        {% for e in form.password.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+        {% for e in form.password.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
       </div>
       <input type="hidden" name="next" value="{{ next }}">
       <button type="submit" class="btn-primary w-full">Log in</button>
     </form>
 
-    <div class="flex items-center justify-between mt-4 text-sm">
+    <div class="flex flex-wrap items-center justify-between gap-3 mt-4 text-sm">
       <a href="{% url 'accounts:password_reset' %}" class="text-ink hover:text-link">Forgot password?</a>
       <a href="{% url 'accounts:register' %}" class="text-link font-medium">Create account</a>
     </div>

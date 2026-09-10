@@ -37,6 +37,14 @@ class CheckoutForm(forms.ModelForm):
 
 
 class PaymentProofForm(forms.ModelForm):
+    def clean_slip_image(self):
+        image = self.cleaned_data["slip_image"]
+        if image.size > 5 * 1024 * 1024:
+            raise forms.ValidationError("Please upload an image smaller than 5 MB.")
+        if getattr(image, "image", None) and image.image.format not in {"JPEG", "PNG", "WEBP"}:
+            raise forms.ValidationError("Please use a JPEG, PNG or WebP image.")
+        return image
+
     class Meta:
         model = PaymentProof
         fields = ("slip_image",)

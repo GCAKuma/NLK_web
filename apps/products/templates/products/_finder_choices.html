@@ -1,0 +1,10 @@
+<fieldset class="card p-5 sm:p-7">
+ <legend class="sr-only">Your course or study area</legend>
+ <h2 class="font-semibold text-lg mb-2">What are you studying?</h2>
+ <p class="text-sm text-muted mb-5">Choose the option closest to you.</p>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+ {% for value,label in student_types %}
+  <button name="type" value="{{ value }}" type="submit" class="chip rounded-xl justify-between !py-4 {% if selected == value %}chip-active{% endif %}" aria-pressed="{% if selected == value %}true{% else %}false{% endif %}">{{ label }}<span aria-hidden="true">→</span></button>
+ {% endfor %}
+ </div>
+</fieldset>

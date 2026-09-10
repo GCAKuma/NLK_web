@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import redirect, render
 
-from notifications.tasks import send_quotation_alert
+from notifications.outbox import enqueue_quotation
 
 from .forms import QuotationRequestForm
 
@@ -12,8 +12,9 @@ def quotation(request):
     if request.method == "POST":
         form = QuotationRequestForm(request.POST)
         if form.is_valid():
-            quote = form.save()
-            transaction.on_commit(lambda: send_quotation_alert.delay(quote.id))
+            with transaction.atomic():
+                quote = form.save()
+                enqueue_quotation(quote.id)
             messages.success(
                 request,
                 "Thank you! Your quotation request has been received. "

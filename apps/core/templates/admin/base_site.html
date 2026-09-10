@@ -11,19 +11,23 @@
 
 {% block extrastyle %}{{ block.super }}
 <style>
-  :root {
-    --primary: #0a2342;
-    --secondary: #071A2F;
-    --accent: #00D9FF;
-    --link-fg: #0e7490;
-    --link-hover-color: #0891b2;
+  html:root[data-theme] {
+    --primary: #0B3278;
+    --secondary: #0B3278;
+    --accent: #1456C0;
+    --link-fg: #1456C0;
+    --link-hover-color: #1048A3;
     --header-color: #ffffff;
     --header-branding-color: #ffffff;
     --breadcrumbs-fg: #cbd5e1;
-    --default-button-bg: #0e7490;
-    --button-bg: #0e7490;
-    --button-hover-bg: #0a5f77;
+    --default-button-bg: #1456C0;
+    --button-bg: #1456C0;
+    --button-hover-bg: #1048A3;
   }
   #site-name a:link, #site-name a:visited { color: #fff; }
+  html:root[data-theme="dark"] { --link-fg: #8bbbff; --link-hover-color: #bad7ff; }
+  @media (prefers-color-scheme: dark) {
+    html:root[data-theme="auto"] { --link-fg: #8bbbff; --link-hover-color: #bad7ff; }
+  }
 </style>
 {% endblock %}

@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew NLK HTTPS certificate and reload Nginx
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/nlk
+ExecStart=/bin/sh /opt/nlk/deploy/renew-certificates.sh

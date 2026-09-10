@@ -1,4 +1,5 @@
 import secrets
+import uuid
 from datetime import datetime
 
 from django.conf import settings
@@ -6,6 +7,7 @@ from django.db import models
 from django.db.models import Q
 
 from core.models import TimeStampedModel
+from core.storage import private_storage
 
 
 def generate_order_number():
@@ -32,6 +34,7 @@ class Order(TimeStampedModel):
     order_number = models.CharField(
         max_length=32, unique=True, default=generate_order_number, editable=False
     )
+    checkout_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     status = models.CharField(
         max_length=30, choices=Status.choices, default=Status.PENDING, db_index=True
     )
@@ -115,7 +118,7 @@ class PaymentProof(TimeStampedModel):
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="payment_proof"
     )
-    slip_image = models.ImageField(upload_to="payment_slips/")
+    slip_image = models.ImageField(upload_to="payment_slips/", storage=private_storage)
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True
     )

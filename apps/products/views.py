@@ -117,7 +117,7 @@ def product_detail(request, slug):
     related = (
         Product.objects.filter(category=product.category, is_active=True)
         .exclude(pk=product.pk)
-        .select_related("category")[:4]
+        .select_related("category").prefetch_related("images", "variants")[:4]
     )
     questions = product.questions.filter(status=ProductQuestion.Status.PUBLISHED)
 

@@ -6,6 +6,9 @@ __pycache__
 *.pyc
 node_modules
 media
+backups
+import-media
+nginx/active.conf
 staticfiles
 .env
 .env.*

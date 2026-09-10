@@ -1,5 +1,10 @@
 # Deploying to AWS (evaluation phase)
 
+> Superseded for this project's Supabase deployment by
+> [AWS launch assessment and workflow](aws-go-live-review.md), reviewed 2026-09-09.
+> The instructions below assume local PostgreSQL and contain outdated Free Tier
+> and Elastic IP pricing claims. Do not use them as the current launch runbook.
+
 This walks through hosting the existing `docker-compose.prod.yml` stack on a
 single AWS EC2 instance — the simplest path that matches what's already
 built, appropriate for a ~6 month evaluation before deciding on long-term

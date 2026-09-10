@@ -2,10 +2,10 @@
 # ---------------------------------------------------------------------------
 # Stage 1 — compile minified Tailwind CSS
 # ---------------------------------------------------------------------------
-FROM node:20-alpine AS frontend
+FROM node:22-alpine AS frontend
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm ci
 # Configs + everything Tailwind scans for class usage
 COPY tailwind.config.js postcss.config.js ./
 COPY static ./static
@@ -31,8 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libgdk-pixbuf-2.0-0 libcairo2 libffi8 shared-mime-info fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt requirements-prod.txt ./
-RUN pip install --upgrade pip && pip install -r requirements-prod.txt
+COPY requirements-prod.lock.txt ./
+RUN pip install -r requirements-prod.lock.txt
 
 COPY . .
 # Replace any dev CSS with the minified build from stage 1

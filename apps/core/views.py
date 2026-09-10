@@ -11,7 +11,7 @@ def home(request):
         "categories": Category.objects.filter(is_active=True, parent__isnull=True),
         "best_sellers": Product.objects.filter(
             is_active=True, is_featured=True
-        ).select_related("category")[:8],
+        ).select_related("category").prefetch_related("images", "variants")[:8],
         "testimonials": Testimonial.objects.filter(is_active=True),
         "videos": VideoEmbed.objects.filter(is_active=True),
         "trust_stats": TrustStat.objects.filter(is_active=True),

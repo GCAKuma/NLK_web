@@ -4,11 +4,11 @@
 {% block content %}
 <div class="mx-auto max-w-6xl px-4 py-10">
   <div class="mb-8">
-    <h1 class="font-heading font-extrabold text-3xl text-ink">Compare Calculators</h1>
-    <p class="text-muted mt-2">Choose up to 3 models from the dropdowns — the spec table updates instantly.</p>
+    <p class="eyebrow mb-3">Make an informed choice</p><h1 class="font-heading font-semibold text-3xl text-ink">Compare Calculators</h1>
+    <p class="text-muted mt-2">Choose two or three models to compare their features, prices and warranty.</p>
   </div>
 
-  <div id="compare-panel">
+  <div id="compare-panel" aria-live="polite">
     {% include "products/_compare_panel.html" %}
   </div>
 </div>

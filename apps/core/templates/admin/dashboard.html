@@ -6,22 +6,22 @@
   .nlk-dash { margin-bottom: 28px; }
   .nlk-grid { display: grid; gap: 14px; }
   .nlk-kpis { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 16px; }
-  .nlk-card { background: #071A2F; color: #fff; border-radius: 12px; padding: 18px 20px; }
+  .nlk-card { background: #0B3278; color: #fff; border-radius: 12px; padding: 18px 20px; }
   .nlk-card .val { font-size: 26px; font-weight: 700; line-height: 1.1; }
   .nlk-card .lbl { font-size: 12px; color: #9fb3c8; margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
   .nlk-alerts { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 20px; }
-  .nlk-alert { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e2e8f0;
-               border-radius: 12px; padding: 14px 16px; text-decoration: none; color: #0f172a; }
+  .nlk-alert { display: flex; align-items: center; gap: 12px; background: var(--body-bg); border: 1px solid var(--hairline-color);
+               border-radius: 12px; padding: 14px 16px; text-decoration: none; color: var(--body-fg); }
   .nlk-alert .count { min-width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center;
                       justify-content: center; font-weight: 700; font-size: 18px; background: #eef2f7; color: #64748b; }
   .nlk-alert .lbl { font-size: 13px; font-weight: 600; }
-  .nlk-alert.is-active { border-color: #00D9FF; box-shadow: 0 0 0 1px #00D9FF33; }
-  .nlk-alert.is-active .count { background: #00D9FF; color: #071A2F; }
-  .nlk-recent { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+  .nlk-alert.is-active { border-color: #1456C0; box-shadow: 0 0 0 1px #1456C033; }
+  .nlk-alert.is-active .count { background: #1456C0; color: #fff; }
+  .nlk-recent { background: var(--body-bg); border: 1px solid var(--hairline-color); border-radius: 12px; overflow: hidden; }
   .nlk-recent-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; }
   .nlk-recent-head h2 { margin: 0; font-size: 15px; }
   .nlk-recent table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .nlk-recent th { text-align: left; padding: 8px 18px; color: #64748b; font-weight: 600; background: #f8fafc; }
+  .nlk-recent th { text-align: left; padding: 8px 18px; color: var(--body-fg); font-weight: 600; background: var(--darkened-bg); }
   .nlk-recent td { padding: 10px 18px; border-top: 1px solid #eef2f7; }
   .nlk-dash h1.nlk-title { font-size: 18px; margin: 0 0 14px; }
 </style>
@@ -49,7 +49,7 @@
   {% endif %}
 
   {% if nlk_recent_orders %}
-    <div class="nlk-recent">
+    <div class="nlk-recent" style="overflow-x:auto">
       <div class="nlk-recent-head">
         <h2>Recent orders</h2>
         <a href="{{ nlk_orders_url }}">View all &rarr;</a>

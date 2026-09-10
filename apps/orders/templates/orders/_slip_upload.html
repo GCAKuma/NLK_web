@@ -1,19 +1,13 @@
 {% if proof_form %}
-  <div class="rounded-xl shadow-card border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-5 mt-6">
-    <h3 class="font-heading font-semibold text-amber-900 dark:text-amber-200 mb-2">Upload your bank deposit slip</h3>
-    <p class="text-sm text-amber-800 dark:text-amber-200/80 mb-3">
-      Please deposit the total to our bank account and upload a photo of the slip.
-      We'll verify it and confirm your order.
-    </p>
-    <form method="post" action="{% url 'orders:upload_slip' order.order_number %}" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 sm:items-center">
-      {% csrf_token %}
-      {{ proof_form.slip_image }}
-      <button type="submit" class="btn-primary shrink-0">Upload slip</button>
-    </form>
-  </div>
+<section class="card p-5 sm:p-7 mt-6 border-l-4 border-l-accent">
+ <span class="badge status-warning mb-3">Action needed</span><h2 class="text-xl font-semibold mb-3">Upload your bank deposit slip</h2>
+ <p class="text-sm text-muted mb-3">After making your deposit, upload a clear photo of the slip. Your order will move to payment verification.</p><p class="text-sm text-muted mb-5">Need bank account details? <a href="{% url 'contact' %}" class="text-link underline">Contact the NLK team</a> before making your deposit.</p>
+ <form method="post" action="{% url 'orders:upload_slip' order.order_number %}" enctype="multipart/form-data" class="space-y-4">{% csrf_token %}{% include 'components/field.html' with field=proof_form.slip_image label='Bank deposit slip' %}<button type="submit" class="btn-primary">Upload slip</button></form>
+</section>
 {% elif order.payment_method == 'bank_deposit' %}
-  <div class="card border border-line p-5 mt-6">
-    <h3 class="font-heading font-semibold text-ink mb-1">Payment slip</h3>
-    <p class="text-sm text-green-700">✓ Slip uploaded — status: {{ order.payment_proof.get_status_display }}. We'll confirm shortly.</p>
-  </div>
+<section class="card p-5 sm:p-7 mt-6"><h2 class="font-semibold text-lg mb-3">Payment verification</h2>
+ {% if order.payment_proof.status == 'verified' %}<span class="badge status-success">Payment verified</span><p class="text-sm text-muted mt-3">Your bank deposit has been verified.</p>
+ {% elif order.payment_proof.status == 'rejected' %}<span class="badge status-error">Slip not accepted</span><p class="text-sm text-muted mt-3">Please contact our team for help with your payment proof.</p><a class="btn-outline mt-4" href="{% url 'contact' %}">Contact support</a>
+ {% else %}<span class="badge status-warning">Awaiting verification</span><p class="text-sm text-muted mt-3">Your slip has been received. Our team will review it and update your order.</p>{% endif %}
+</section>
 {% endif %}

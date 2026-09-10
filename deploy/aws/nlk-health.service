@@ -1,0 +1,6 @@
+[Unit]
+Description=Check NLK application and notification backlog
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/nlk
+ExecStart=/bin/sh /opt/nlk/deploy/check-health.sh
