@@ -1,0 +1,46 @@
+name: Test and deploy EC2
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test with isolated PostgreSQL
+        run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+      - name: Check migration consistency
+        run: docker compose -f docker-compose.test.yml run --rm tests python manage.py makemigrations --check --dry-run
+      - name: Check shell scripts
+        run: for script in deploy/*.sh; do sh -n "$script"; done
+      - name: Clean up test services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down --volumes
+
+  deploy:
+    needs: verify
+    # Never run pull-request code on the server that holds application secrets.
+    # Enable explicitly only after the first manual deployment is working.
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/codex/aws-production' &&
+      github.repository == 'GCAKuma/NLK_web' &&
+      github.event.repository.private == true &&
+      vars.EC2_DEPLOY_ENABLED == 'true'
+    runs-on: [self-hosted, Linux, X64, nlk-test]
+    timeout-minutes: 40
+    concurrency:
+      group: nlk-test-deployment
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Deploy the tested commit
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+          DEPLOY_URL: ${{ vars.EC2_TEST_URL }}
+        run: bash deploy/github-deploy.sh "$RELEASE_SHA" "$DEPLOY_URL"

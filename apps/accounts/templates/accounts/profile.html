@@ -26,23 +26,23 @@
     {# Personal details #}
     <div class="card border border-line p-6">
       <h2 class="font-heading font-semibold text-ink mb-4">Personal details</h2>
-      <form method="post" class="space-y-4">
+      {% include "components/form_errors.html" with form=profile_form %}<form method="post" class="space-y-4">
         {% csrf_token %}
         <div>
-          <label class="field-label">Email</label>
-          <input type="email" value="{{ user.email }}" disabled
+          <label class="field-label" for="account-email">Email</label>
+          <input id="account-email" type="email" value="{{ user.email }}" disabled
                  class="field-input opacity-70 cursor-not-allowed">
-          <p class="text-[11px] text-muted mt-1">Email can't be changed here.</p>
+          <p class="text-xs text-muted mt-1">Email can't be changed here.</p>
         </div>
         <div>
           <label class="field-label" for="{{ profile_form.full_name.id_for_label }}">Full name</label>
           {{ profile_form.full_name }}
-          {% for e in profile_form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          {% for e in profile_form.full_name.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
         </div>
         <div>
           <label class="field-label" for="{{ profile_form.phone_number.id_for_label }}">Phone number</label>
           {{ profile_form.phone_number }}
-          {% for e in profile_form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+          {% for e in profile_form.phone_number.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
         </div>
         <button type="submit" name="save_profile" class="btn-primary w-full">Save details</button>
       </form>
@@ -51,37 +51,38 @@
     {# Delivery address #}
     <div class="card border border-line p-6">
       <h2 class="font-heading font-semibold text-ink mb-4">Delivery address</h2>
+      {% include "components/form_errors.html" with form=address_form %}
       <form method="post" class="space-y-4">
         {% csrf_token %}
-        <div class="grid grid-cols-2 gap-3">
-          <div class="col-span-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
             <label class="field-label" for="{{ address_form.full_name.id_for_label }}">Recipient name</label>
             {{ address_form.full_name }}
-            {% for e in address_form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+            {% for e in address_form.full_name.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
           </div>
-          <div class="col-span-2">
+          <div class="sm:col-span-2">
             <label class="field-label" for="{{ address_form.phone_number.id_for_label }}">Phone</label>
             {{ address_form.phone_number }}
-            {% for e in address_form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+            {% for e in address_form.phone_number.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
           </div>
-          <div class="col-span-2">
+          <div class="sm:col-span-2">
             <label class="field-label" for="{{ address_form.address_line1.id_for_label }}">Address line 1</label>
             {{ address_form.address_line1 }}
-            {% for e in address_form.address_line1.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+            {% for e in address_form.address_line1.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
           </div>
-          <div class="col-span-2">
+          <div class="sm:col-span-2">
             <label class="field-label" for="{{ address_form.address_line2.id_for_label }}">Address line 2</label>
             {{ address_form.address_line2 }}
           </div>
           <div>
             <label class="field-label" for="{{ address_form.city.id_for_label }}">City</label>
             {{ address_form.city }}
-            {% for e in address_form.city.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+            {% for e in address_form.city.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
           </div>
           <div>
             <label class="field-label" for="{{ address_form.district.id_for_label }}">District</label>
             {{ address_form.district }}
-            {% for e in address_form.district.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
+            {% for e in address_form.district.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
           </div>
           <div>
             <label class="field-label" for="{{ address_form.postal_code.id_for_label }}">Postal code</label>

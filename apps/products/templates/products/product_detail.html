@@ -1,165 +1,34 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load humanize %}
 {% block title %}{{ product.name }} — NLK{% endblock %}
 {% block meta_description %}{{ product.description|striptags|truncatewords:25 }}{% endblock %}
-
 {% block content %}
-<div class="mx-auto max-w-7xl px-4 py-8">
-
-  {# Breadcrumb #}
-  <nav class="text-xs text-muted mb-5">
-    <a href="{% url 'home' %}" class="hover:text-link">Home</a><span class="mx-1">/</span>
-    <a href="{% url 'products:category' product.category.slug %}" class="hover:text-link">{{ product.category.name }}</a><span class="mx-1">/</span>
-    <span class="text-ink">{{ product.name }}</span>
-  </nav>
-
-  <div class="grid md:grid-cols-2 gap-8">
-    {# ---------- Gallery ---------- #}
-    <div x-data="{ img: '{% if product.primary_image %}{{ product.primary_image.url }}{% endif %}' }">
-      <div class="card border border-line aspect-square bg-elevated overflow-hidden">
-        {% if product.primary_image %}
-          <img :src="img" alt="{{ product.name }}" class="w-full h-full object-cover">
-        {% else %}
-          <div class="w-full h-full flex items-center justify-center text-muted font-heading text-5xl">NLK</div>
-        {% endif %}
-      </div>
-      {% if product.images.count > 1 %}
-        <div class="flex gap-2 mt-3">
-          {% for im in product.images.all %}
-            <button type="button" @click="img='{{ im.image.url }}'"
-                    :class="img==='{{ im.image.url }}' ? 'ring-2 ring-accent' : 'ring-1 ring-line'"
-                    class="h-16 w-16 rounded-lg overflow-hidden bg-elevated">
-              <img src="{{ im.image.url }}" alt="{{ im.alt_text }}" class="w-full h-full object-cover">
-            </button>
-          {% endfor %}
-        </div>
-      {% endif %}
-    </div>
-
-    {# ---------- Info ---------- #}
-    <div>
-      {% if product.brand %}<div class="text-xs text-muted uppercase tracking-wide">{{ product.brand }}</div>{% endif %}
-      <h1 class="font-heading font-bold text-2xl md:text-3xl text-ink mt-1">{{ product.name }}</h1>
-
-      <div class="mt-4 font-heading font-extrabold text-3xl text-ink">
-        {% if product.display_price %}Rs. {{ product.display_price|floatformat:0|intcomma }}{% else %}<span class="text-lg text-muted">Ask for price</span>{% endif %}
-      </div>
-
-      <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
-        {% if product.warranty_period %}<span class="inline-flex items-center gap-1 text-green-700">🛡️ {{ product.warranty_period }} warranty</span>{% endif %}
-        {% if product.in_stock %}
-          <span class="inline-flex items-center gap-1 text-green-700">● In stock</span>
-        {% else %}
-          <span class="inline-flex items-center gap-1 text-muted">● Out of stock</span>
-        {% endif %}
-      </div>
-
-      {% if product.description %}
-        <p class="mt-5 text-sm text-ink leading-relaxed">{{ product.description }}</p>
-      {% endif %}
-
-      {% if product.variants.all %}
-        <form method="post" action="{% url 'cart:add' %}" class="mt-6 space-y-4">
-          {% csrf_token %}
-          {% if product.variants.count > 1 %}
-            <div>
-              <span class="field-label">Options</span>
-              <div class="flex flex-wrap gap-2">
-                {% for v in product.variants.all %}
-                  <label class="cursor-pointer">
-                    <input type="radio" name="variant_id" value="{{ v.id }}" class="peer sr-only"
-                           {% if forloop.first %}checked{% endif %} {% if not v.in_stock %}disabled{% endif %}>
-                    <span class="inline-block px-3 py-1.5 rounded-lg border text-sm border-line peer-checked:border-accent peer-checked:text-link peer-checked:bg-accent/10 {% if not v.in_stock %}opacity-40 line-through{% endif %}">{{ v.label }}</span>
-                  </label>
-                {% endfor %}
-              </div>
-            </div>
-          {% else %}
-            <input type="hidden" name="variant_id" value="{{ product.default_variant.id }}">
-          {% endif %}
-
-          <div class="flex items-center gap-3">
-            <label for="qty" class="text-sm font-medium text-ink">Qty</label>
-            <input id="qty" type="number" name="quantity" value="1" min="1" class="field-input w-20">
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-3">
-            {% if site_settings.whatsapp_business_number %}
-              <a href="https://wa.me/{{ site_settings.whatsapp_business_number }}?text=Hi%2C%20I%27d%20like%20to%20order%3A%20{{ product.name|urlencode }}"
-                 target="_blank" rel="noopener" class="btn-whatsapp flex-1">Order on WhatsApp</a>
-            {% endif %}
-            {% if user.is_authenticated %}
-              <button type="submit" class="btn-primary flex-1" {% if not product.in_stock %}disabled{% endif %}>Add to Cart</button>
-            {% else %}
-              <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn-primary flex-1 text-center">Log in to add</a>
-            {% endif %}
-          </div>
-        </form>
-      {% endif %}
-    </div>
+<div class="mx-auto max-w-7xl px-4 py-8 md:py-12">
+ <nav aria-label="Breadcrumb" class="text-sm text-muted mb-7 flex flex-wrap gap-2"><a href="{% url 'home' %}" class="hover:text-link">Home</a><span aria-hidden="true">/</span><a href="{% url 'products:category' product.category.slug %}" class="hover:text-link">{{ product.category.name }}</a><span aria-hidden="true">/</span><span aria-current="page">{{ product.name }}</span></nav>
+ <div class="grid md:grid-cols-2 gap-6 lg:gap-12 items-start">
+  <div class="min-w-0" x-data="{ img: '{% if product.primary_image %}{{ product.primary_image.url|escapejs }}{% endif %}' }">
+   <div class="card aspect-square bg-white overflow-hidden p-5 sm:p-10">{% if product.primary_image %}<img src="{{ product.primary_image.url }}" :src="img" alt="{{ product.name }}" class="w-full h-full object-contain" width="640" height="640">{% else %}<div class="w-full h-full flex items-center justify-center text-slate-500">Product image coming soon</div>{% endif %}</div>
+   {% if product.images.count > 1 %}<div class="flex gap-3 mt-4 overflow-x-auto p-1">{% for im in product.images.all %}<button type="button" @click="img='{{ im.image.url|escapejs }}'" :aria-pressed="img==='{{ im.image.url|escapejs }}'" :class="img==='{{ im.image.url|escapejs }}' ? 'ring-2 ring-accent' : 'ring-1 ring-line'" class="h-20 w-20 shrink-0 rounded-lg overflow-hidden bg-white p-2" aria-label="View image {{ forloop.counter }} of {{ product.name }}"><img src="{{ im.image.url }}" alt="{{ im.alt_text|default:product.name }}" class="w-full h-full object-contain"></button>{% endfor %}</div>{% endif %}
   </div>
-
-  {# ---------- Specifications ---------- #}
-  {% if product.specifications.all %}
-    <section class="mt-12">
-      <h2 class="font-heading font-bold text-xl text-ink mb-4">Specifications</h2>
-      <div class="card border border-line overflow-hidden">
-        <table class="w-full text-sm">
-          <tbody>
-            {% for spec in product.specifications.all %}
-              <tr class="{% cycle 'bg-surface' 'bg-elevated' %}">
-                <td class="px-4 py-3 font-medium text-ink w-1/3">{{ spec.spec_name }}</td>
-                <td class="px-4 py-3 text-ink">{{ spec.spec_value }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  {% endif %}
-
-  {# ---------- Customer Q&A ---------- #}
-  <section class="mt-12">
-    <h2 class="font-heading font-bold text-xl text-ink mb-4">Questions &amp; Answers</h2>
-
-    <div class="space-y-4">
-      {% for q in questions %}
-        <div class="card border border-line p-4">
-          <div class="flex gap-2"><span class="font-bold text-link">Q</span><p class="text-sm text-ink font-medium">{{ q.question }}</p></div>
-          {% if q.answer %}<div class="flex gap-2 mt-2"><span class="font-bold text-ink">A</span><p class="text-sm text-ink">{{ q.answer }}</p></div>{% endif %}
-        </div>
-      {% empty %}
-        <p class="text-sm text-muted">No questions yet. Be the first to ask!</p>
-      {% endfor %}
-    </div>
-
-    <div class="mt-6 card border border-line p-5 max-w-2xl">
-      <h3 class="font-medium text-ink mb-3">Ask a question</h3>
-      {% if user.is_authenticated %}
-        <form method="post" action="{% url 'products:ask_question' product.slug %}" class="space-y-3">
-          {% csrf_token %}
-          <textarea name="question" rows="3" required placeholder="What would you like to know about this product?" class="field-input"></textarea>
-          <button type="submit" class="btn-primary">Submit question</button>
-        </form>
-      {% else %}
-        <p class="text-sm text-muted">
-          Please <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-link font-medium">log in</a> to ask a question.
-        </p>
-      {% endif %}
-    </div>
-  </section>
-
-  {# ---------- Related ---------- #}
-  {% if related_products %}
-    <section class="mt-12">
-      <h2 class="font-heading font-bold text-xl text-ink mb-4">Related Products</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {% for product in related_products %}
-          {% include "products/_product_card.html" %}
-        {% endfor %}
-      </div>
-    </section>
-  {% endif %}
-
+  <div class="purchase-panel min-w-0">
+   <p class="eyebrow mb-3">{{ product.brand|default:product.category.name }}</p><h1 class="text-2xl lg:text-3xl font-semibold">{{ product.name }}</h1>
+   <p class="text-3xl font-semibold mt-5" data-product-price>{% if product.display_price != None %}Rs. {{ product.display_price|floatformat:0|intcomma }}{% else %}Ask for price{% endif %}</p>
+   <div class="flex flex-wrap gap-2 mt-4">{% if product.in_stock %}<span class="badge status-success">In stock</span>{% else %}<span class="badge status-warning">Out of stock</span>{% endif %}{% if product.warranty_period %}<span class="badge">{{ product.warranty_period }} warranty</span>{% endif %}</div>
+   {% if product.description %}<p class="text-muted text-sm leading-relaxed mt-5">{{ product.description|linebreaksbr }}</p>{% endif %}
+   {% if product.variants.all %}
+   <form method="post" action="{% url 'cart:add' %}" class="mt-6 space-y-5" data-product-form>
+    {% csrf_token %}
+    <div><label class="field-label" for="variant-id">Choose an option</label><select name="variant_id" id="variant-id" class="field-input" required data-variant-picker><option value="" disabled selected>Select an available option</option>{% for v in product.variants.all %}{% if v.is_active %}<option value="{{ v.id }}" data-price="{{ v.price|floatformat:0|intcomma }}" data-stock="{{ v.stock_quantity }}" {% if not v.in_stock %}disabled{% endif %}>{{ v.label }} — Rs. {{ v.price|floatformat:0|intcomma }}{% if not v.in_stock %} (out of stock){% endif %}</option>{% endif %}{% endfor %}</select></div>
+    <div class="flex items-center gap-3"><label for="qty" class="text-sm font-semibold">Quantity</label><input id="qty" name="quantity" type="number" value="1" min="1" class="field-input !w-24" required></div>
+    <div class="grid gap-3">{% if not product.in_stock %}<button type="button" class="btn-primary" disabled>Currently out of stock</button>{% elif user.is_authenticated %}<button class="btn-primary" type="submit">Add to cart {% include 'components/icon.html' with name='cart' %}</button>{% else %}<a class="btn-primary" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in to add to cart</a>{% endif %}
+    {% if site_settings.whatsapp_business_number %}<a class="btn-whatsapp" target="_blank" rel="noopener" href="https://wa.me/{{ site_settings.whatsapp_business_number }}?text=Hi%2C%20I%27d%20like%20to%20order%3A%20{{ product.name|urlencode }}">{% include 'components/icon.html' with name='chat' %} Order on WhatsApp</a>{% endif %}</div>
+   </form>{% endif %}
+   <div class="border-t border-line mt-6 pt-5 text-sm text-muted space-y-2"><p>Cash on delivery or bank deposit</p><p>Delivery across Sri Lanka · Shipping shown at checkout</p></div>
+  </div>
+ </div>
+ {% if product.specifications.all %}<section class="mt-12"><h2 class="section-title mb-5">The details that matter.</h2><div class="card overflow-hidden"><table class="w-full text-sm"><caption class="sr-only">{{ product.name }} specifications</caption><tbody>{% for spec in product.specifications.all %}<tr class="{% cycle 'bg-surface' 'bg-elevated' %}"><th scope="row" class="text-left px-4 sm:px-6 py-4 font-medium w-1/3">{{ spec.spec_name }}</th><td class="px-4 sm:px-6 py-4">{{ spec.spec_value }}</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
+ <section class="mt-12 grid lg:grid-cols-2 gap-8"><div><p class="eyebrow mb-3">Before you choose</p><h2 class="section-title mb-5">Questions &amp; answers</h2><div class="space-y-4">{% for q in questions %}<div class="card p-5"><p class="font-semibold text-sm">{{ q.question }}</p>{% if q.answer %}<p class="text-sm text-muted mt-3">{{ q.answer }}</p>{% endif %}</div>{% empty %}<p class="text-muted text-sm">No questions yet. Ask us what you’d like to know.</p>{% endfor %}</div></div>
+ <div class="card p-6 self-start"><h3 class="font-semibold text-lg mb-2">A little more information?</h3><p class="text-sm text-muted mb-5">Our team can help you choose with confidence.</p>{% if user.is_authenticated %}<form method="post" action="{% url 'products:ask_question' product.slug %}" class="space-y-4">{% csrf_token %}<label for="product-question" class="field-label">Your question</label><textarea id="product-question" name="question" rows="4" required class="field-input" placeholder="What would you like to know?"></textarea><button class="btn-primary">Submit question</button></form>{% else %}<a class="btn-outline" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in to ask a question</a>{% endif %}</div></section>
+ {% if related_products %}<section class="mt-14"><div class="section-head"><h2 class="section-title">You might also like</h2></div><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">{% for product in related_products %}{% include 'products/_product_card.html' %}{% endfor %}</div></section>{% endif %}
 </div>
 {% endblock %}

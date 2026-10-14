@@ -16,6 +16,8 @@ db.sqlite3
 .env
 .env.*
 !.env.example
+!.env.prod.example
+!.env.migrate.example
 
 # Node
 node_modules/
@@ -26,3 +28,6 @@ npm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+/nginx/active.conf
+/backups/
+/import-media/

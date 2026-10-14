@@ -1,15 +1,10 @@
+<form method="get" action="{% url 'products:calculator_finder' %}" hx-get="{% url 'products:calculator_finder' %}" hx-target="#finder-result" hx-swap="innerHTML" hx-push-url="true" hx-indicator="#finder-loading">
+ {% include 'products/_finder_choices.html' %}
+ <p id="finder-loading" class="request-indicator mt-4" role="status">Finding your options…</p>
+</form>
+<div class="mt-8" aria-live="polite">
 {% if selected %}
-  {% if recommendations %}
-    <h2 class="font-heading font-bold text-xl text-ink mb-4">Our recommendation</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {% for rec in recommendations %}
-        {% with product=rec.recommended_product %}
-          {% include "products/_product_card.html" %}
-        {% endwith %}
-      {% endfor %}
-    </div>
-  {% else %}
-    <p class="text-muted">No recommendation set for this option yet. Please browse our
-      <a href="{% url 'products:category' 'calculators' %}" class="text-link underline">calculators</a>.</p>
-  {% endif %}
-{% endif %}
+ {% if recommendations %}<h2 class="section-title mb-5">Your recommended options</h2><div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">{% for rec in recommendations %}{% with product=rec.recommended_product %}{% include 'products/_product_card.html' %}{% endwith %}{% endfor %}</div>
+ {% else %}<div class="empty-state"><h2 class="font-semibold text-lg text-ink">Let’s find an option together.</h2><p class="mt-2">There isn’t a recommendation for this study area yet.</p><a class="btn-primary mt-5" href="{% url 'products:category' 'calculators' %}">Browse calculators</a></div>{% endif %}
+{% else %}<p class="text-sm text-muted">Your recommendations will appear here after you choose a study area.</p>{% endif %}
+</div>

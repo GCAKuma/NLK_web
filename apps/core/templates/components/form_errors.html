@@ -1,0 +1,1 @@
+{% if form.errors %}<div class="status-error rounded-xl p-4 mb-5" role="alert"><h2 class="font-semibold text-sm">Please check the highlighted details.</h2>{% for error in form.non_field_errors %}<p class="text-sm mt-1">{{ error }}</p>{% endfor %}</div>{% endif %}

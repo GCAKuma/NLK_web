@@ -3,7 +3,7 @@
   <p class="text-sm text-muted">{{ product_count }} product{{ product_count|pluralize }}</p>
 </div>
 {% if products %}
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
     {% for product in products %}
       {% include "products/_product_card.html" %}
     {% endfor %}
@@ -26,8 +26,9 @@
     </nav>
   {% endif %}
 {% else %}
-  <div class="text-center py-20 text-muted">
-    <div class="text-4xl mb-3">🔍</div>
-    No products match your filters.
+  <div class="empty-state">
+    <h2 class="text-xl font-semibold text-ink mb-2">No matches this time.</h2>
+    <p>Try another search or remove a filter to see more products.</p>
+    <a class="btn-outline mt-5" href="{{ request.path }}">Clear search &amp; filters</a>
   </div>
 {% endif %}

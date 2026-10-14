@@ -1,0 +1,24 @@
+name: nlk-isolated-tests
+services:
+  test-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nlk_test
+      POSTGRES_USER: nlk_test
+      POSTGRES_PASSWORD: isolated-test-only
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U nlk_test -d nlk_test]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  tests:
+    image: nlk-production-test:local
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+    depends_on:
+      test-db: {condition: service_healthy}
+    command: [python, manage.py, test, --noinput, --verbosity, "2"]

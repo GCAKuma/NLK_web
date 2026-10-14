@@ -1,103 +1,25 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load humanize %}
 {% block title %}Checkout — NLK{% endblock %}
-
 {% block content %}
-<div class="mx-auto max-w-7xl px-4 py-8">
-  <h1 class="font-heading font-bold text-2xl text-ink mb-6">Checkout</h1>
-
-  <form method="post" class="grid lg:grid-cols-3 gap-6">
-    {% csrf_token %}
-
-    {# Left: address + payment #}
-    <div class="lg:col-span-2 space-y-6">
-      <div class="card border border-line p-5">
-        <h2 class="font-heading font-semibold text-ink mb-4">Shipping Address</h2>
-        <div class="grid sm:grid-cols-2 gap-4">
-          <div class="sm:col-span-2">
-            <label class="field-label" for="{{ form.full_name.id_for_label }}">Full name</label>
-            {{ form.full_name }}
-            {% for e in form.full_name.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
-          </div>
-          <div>
-            <label class="field-label" for="{{ form.phone_number.id_for_label }}">Phone number</label>
-            {{ form.phone_number }}
-            {% for e in form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
-          </div>
-          <div>
-            <label class="field-label" for="{{ form.postal_code.id_for_label }}">Postal code</label>
-            {{ form.postal_code }}
-          </div>
-          <div class="sm:col-span-2">
-            <label class="field-label" for="{{ form.address_line1.id_for_label }}">Address line 1</label>
-            {{ form.address_line1 }}
-            {% for e in form.address_line1.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
-          </div>
-          <div class="sm:col-span-2">
-            <label class="field-label" for="{{ form.address_line2.id_for_label }}">Address line 2 (optional)</label>
-            {{ form.address_line2 }}
-          </div>
-          <div>
-            <label class="field-label" for="{{ form.city.id_for_label }}">City</label>
-            {{ form.city }}
-            {% for e in form.city.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
-          </div>
-          <div>
-            <label class="field-label" for="{{ form.district.id_for_label }}">District</label>
-            {{ form.district }}
-            {% for e in form.district.errors %}<p class="text-xs text-red-600 mt-1">{{ e }}</p>{% endfor %}
-          </div>
-        </div>
-      </div>
-
-      <div class="card border border-line p-5">
-        <h2 class="font-heading font-semibold text-ink mb-4">Payment Method</h2>
-        <div class="space-y-3">
-          {% for radio in form.payment_method %}
-            <label class="flex items-start gap-3 border border-line rounded-lg p-3 cursor-pointer hover:border-accent">
-              {{ radio.tag }}
-              <span>
-                <span class="font-medium text-ink">{{ radio.choice_label }}</span>
-                <span class="block text-xs text-muted">
-                  {% if 'Cash' in radio.choice_label %}Pay in cash when your order is delivered.{% else %}Deposit to our bank account and upload the slip after placing the order.{% endif %}
-                </span>
-              </span>
-            </label>
-          {% endfor %}
-        </div>
-        {% for e in form.payment_method.errors %}<p class="text-xs text-red-600 mt-2">{{ e }}</p>{% endfor %}
-
-        <div class="mt-4">
-          <label class="field-label" for="{{ form.customer_notes.id_for_label }}">Order notes (optional)</label>
-          {{ form.customer_notes }}
-        </div>
-      </div>
-    </div>
-
-    {# Right: summary #}
-    <div class="lg:col-span-1">
-      <div class="card border border-line p-5 sticky top-24">
-        <h2 class="font-heading font-semibold text-ink mb-4">Order Summary</h2>
-        <div class="space-y-2 text-sm max-h-56 overflow-auto mb-3">
-          {% for item in items %}
-            <div class="flex justify-between gap-2">
-              <span class="text-ink truncate">{{ item.quantity }} × {{ item.product_variant.product.name }}</span>
-              <span class="font-medium whitespace-nowrap">Rs. {{ item.line_total|floatformat:0|intcomma }}</span>
-            </div>
-          {% endfor %}
-        </div>
-        <div class="border-t border-line pt-3 space-y-2 text-sm">
-          <div class="flex justify-between"><span class="text-muted">Subtotal</span><span>Rs. {{ subtotal|floatformat:0|intcomma }}</span></div>
-          <div class="flex justify-between"><span class="text-muted">Shipping</span><span>Rs. {{ shipping_fee|floatformat:0|intcomma }}</span></div>
-          <div class="flex justify-between text-base border-t border-line pt-2">
-            <span class="font-semibold text-ink">Total</span>
-            <span class="font-bold text-ink">Rs. {{ total|floatformat:0|intcomma }}</span>
-          </div>
-        </div>
-        <button type="submit" class="btn-primary w-full mt-5">Place Order</button>
-        <p class="text-[11px] text-muted mt-2 text-center">No online payment — Cash on Delivery or bank deposit.</p>
-      </div>
-    </div>
-  </form>
+<div class="mx-auto max-w-7xl px-4 py-8 md:py-12">
+ <nav aria-label="Checkout progress" class="flex flex-wrap gap-3 text-sm text-muted mb-7"><a href="{% url 'cart:detail' %}" class="text-link">Cart</a><span aria-hidden="true">→</span><span aria-current="step" class="font-semibold text-ink">Delivery &amp; payment</span><span aria-hidden="true">→</span><span>Confirmation</span></nav>
+ <h1 class="text-3xl md:text-4xl font-semibold">Almost yours.</h1><p class="text-muted mt-3 mb-8">Confirm your delivery details and choose how you’d like to pay.</p>
+ {% include 'components/form_errors.html' %}
+ <form method="post" class="grid lg:grid-cols-3 gap-6 lg:gap-8">{% csrf_token %}<input type="hidden" name="checkout_token" value="{{ checkout_token }}">
+  <div class="lg:col-span-2 space-y-6 min-w-0">
+   <section class="card p-5 sm:p-7"><h2 class="text-xl font-semibold mb-2">01 · Delivery details</h2><p class="text-sm text-muted mb-6">This becomes your saved delivery address.</p><div class="grid sm:grid-cols-2 gap-5">
+    <div class="sm:col-span-2">{% include 'components/field.html' with field=form.full_name label='Full name' %}</div>
+    <div>{% include 'components/field.html' with field=form.phone_number label='Phone number' %}</div>
+    <div>{% include 'components/field.html' with field=form.postal_code label='Postal code' %}</div>
+    <div class="sm:col-span-2">{% include 'components/field.html' with field=form.address_line1 label='Street address' %}</div>
+    <div class="sm:col-span-2">{% include 'components/field.html' with field=form.address_line2 label='Apartment, building or additional details' %}</div>
+    <div>{% include 'components/field.html' with field=form.city label='City' %}</div>
+    <div>{% include 'components/field.html' with field=form.district label='District' %}</div>
+   </div></section>
+   <section class="card p-5 sm:p-7"><h2 class="text-xl font-semibold mb-5">02 · Payment</h2><fieldset><legend class="sr-only">Payment method</legend><div class="space-y-3">{% for radio in form.payment_method %}<label class="payment-option flex items-start gap-3 border border-line rounded-xl p-4 cursor-pointer">{{ radio.tag }}<span><strong class="text-sm font-semibold">{{ radio.choice_label }}</strong><span class="block text-sm text-muted mt-1">{% if radio.data.value == 'cod' %}Pay in cash when your order arrives.{% else %}Place your order, then upload a photo of your bank deposit slip for verification.{% endif %}</span></span></label>{% endfor %}</div>{% for error in form.payment_method.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</fieldset><div class="mt-6">{% include 'components/field.html' with field=form.customer_notes label='Order notes' %}</div></section>
+  </div>
+  <div class="min-w-0"><section class="card p-5 sm:p-7 sticky top-24"><h2 class="text-xl font-semibold mb-5">Your order</h2><div class="space-y-4 text-sm mb-5">{% for item in items %}<div class="flex justify-between gap-3"><span class="min-w-0">{{ item.quantity }} × {{ item.product_variant.product.name }}</span><span class="shrink-0 font-medium">Rs. {{ item.line_total|floatformat:0|intcomma }}</span></div>{% endfor %}</div><dl class="border-t border-line pt-4 space-y-3 text-sm"><div class="flex justify-between gap-3"><dt class="text-muted">Subtotal</dt><dd>Rs. {{ subtotal|floatformat:0|intcomma }}</dd></div><div class="flex justify-between gap-3"><dt class="text-muted">Delivery</dt><dd>Rs. {{ shipping_fee|floatformat:0|intcomma }}</dd></div><div class="flex justify-between gap-3 border-t border-line pt-4 text-lg font-semibold"><dt>Total</dt><dd>Rs. {{ total|floatformat:0|intcomma }}</dd></div></dl><button class="btn-primary w-full mt-6">Place order {% include 'components/icon.html' with name='arrow' %}</button><p class="text-xs text-muted mt-4 text-center">Cash on delivery or bank deposit.<br>No card details needed.</p></section></div>
+ </form>
 </div>
 {% endblock %}

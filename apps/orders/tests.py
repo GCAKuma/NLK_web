@@ -29,7 +29,9 @@ class CheckoutFlowTests(TestCase):
         self.client.force_login(self.user)
 
     def _checkout_payload(self, method="cod"):
+        self.client.get(reverse("orders:checkout"))
         return {
+            "checkout_token": self.client.session.get("checkout_token", ""),
             "full_name": "Buyer", "phone_number": "0770000000",
             "address_line1": "1 Main St", "address_line2": "",
             "city": "Colombo", "district": "Colombo", "postal_code": "10000",
@@ -87,6 +89,16 @@ class CheckoutFlowTests(TestCase):
         order = Order.objects.get(user=self.user)
         self.assertEqual(order.status, Order.Status.PENDING)
 
+    def test_invalid_payment_slip_keeps_validation_visible(self):
+        self.client.post(reverse("cart:add"), {"variant_id": self.variant.id})
+        self.client.post(reverse("orders:checkout"), self._checkout_payload("bank_deposit"))
+        order = Order.objects.get(user=self.user)
+        response = self.client.post(reverse("orders:upload_slip", args=[order.order_number]), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "This field is required.")
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.PENDING)
+
     def test_checkout_empty_cart_redirects(self):
         resp = self.client.post(reverse("orders:checkout"), self._checkout_payload())
         self.assertRedirects(resp, reverse("cart:detail"))
@@ -105,6 +117,43 @@ class CheckoutFlowTests(TestCase):
         item = Order.objects.get(user=self.user).items.get()
         self.assertEqual(item.product_name_snapshot, "FX")
         self.assertEqual(item.unit_price, Decimal("2500.00"))
+
+    def test_stock_change_after_cart_is_rejected(self):
+        self.client.post(reverse("cart:add"), {"variant_id": self.variant.pk, "quantity": 3})
+        payload = self._checkout_payload()
+        self.variant.stock_quantity = 1
+        self.variant.save()
+        response = self.client.post(reverse("orders:checkout"), payload)
+        self.assertContains(response, "no longer available")
+        self.assertFalse(Order.objects.exists())
+        self.assertEqual(Cart.objects.get(user=self.user).items.get().quantity, 3)
+
+    def test_repeated_checkout_returns_existing_order(self):
+        self.client.post(reverse("cart:add"), {"variant_id": self.variant.pk})
+        payload = self._checkout_payload()
+        first = self.client.post(reverse("orders:checkout"), payload)
+        second = self.client.post(reverse("orders:checkout"), payload)
+        self.assertEqual(first.url, second.url)
+        self.assertEqual(Order.objects.count(), 1)
+        self.variant.refresh_from_db()
+        self.assertEqual(self.variant.stock_quantity, 4)
+
+    def test_order_and_outbox_commit_without_a_broker(self):
+        from unittest.mock import patch
+        from notifications.models import NotificationJob
+        self.client.post(reverse("cart:add"), {"variant_id": self.variant.pk})
+        payload = self._checkout_payload()
+        with patch("celery.app.task.Task.apply_async", side_effect=ConnectionError("offline")):
+            self.client.post(reverse("orders:checkout"), payload)
+        self.assertEqual(Order.objects.count(), 1)
+        self.assertEqual(NotificationJob.objects.count(), 3)
+
+    def test_missing_checkout_token_cannot_place_order(self):
+        self.client.post(reverse("cart:add"), {"variant_id": self.variant.pk})
+        payload = self._checkout_payload()
+        payload.pop("checkout_token")
+        self.assertContains(self.client.post(reverse("orders:checkout"), payload), "checkout has expired")
+        self.assertFalse(Order.objects.exists())
 
 
 class AuthGateTests(TestCase):

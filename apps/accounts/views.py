@@ -12,12 +12,12 @@ from .forms import AddressForm, ProfileForm, RegistrationForm
 def profile(request):
     """Account page: edit personal details and the saved delivery address."""
     address = getattr(request.user, "address", None)
-    profile_form = ProfileForm(instance=request.user)
+    profile_form = ProfileForm(instance=request.user, auto_id="profile_%s")
     address_form = AddressForm(instance=address)
 
     if request.method == "POST":
         if "save_profile" in request.POST:
-            profile_form = ProfileForm(request.POST, instance=request.user)
+            profile_form = ProfileForm(request.POST, instance=request.user, auto_id="profile_%s")
             if profile_form.is_valid():
                 profile_form.save()
                 messages.success(request, "Your details have been updated.")

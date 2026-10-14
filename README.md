@@ -2,14 +2,17 @@
 
 Single-seller Django e-commerce store for scientific calculators, educational
 technology, electronics, and wholesale supply. Responsive across mobile, tablet,
-and laptop, with a Daraz-style shopping experience, a midnight-navy / electric-cyan
-theme, and a built-in dark mode.
+and laptop, with a logo-derived navy and blue theme, restrained red accents,
+clear shopping journeys, and a built-in dark mode.
 
 ## Stack
 
 Django 5 · PostgreSQL · Django Templates + HTMX + Alpine.js + Tailwind CSS ·
 Celery + Redis · WeasyPrint (invoice PDFs) · Docker Compose.
-(Nginx + Gunicorn production setup is the final milestone.)
+Production uses Nginx + Gunicorn. Follow [AWS start here](docs/aws-start-here.md)
+for the EC2/Supabase deployment and remaining account setup.
+For updates after the first working release, see
+[GitHub Actions deployment](docs/github-actions-ec2.md).
 
 ## Prerequisites
 
@@ -17,6 +20,10 @@ Celery + Redis · WeasyPrint (invoice PDFs) · Docker Compose.
   all run in containers.
 
 ## Quick start
+
+These commands are for a disposable development database. Your existing `.env`
+may connect to hosted Supabase: do not overwrite it or run `seed_demo` against
+the hosted database. Use `docker-compose.test.yml` for isolated automated tests.
 
 ```bash
 # 1. Env file (a working dev .env is already present)
@@ -190,7 +197,8 @@ DKIM record to add when you create the sending domain there.
   faceted filtering, product detail with customer Q&A, cart, checkout (COD /
   bank deposit + slip upload), Celery invoice PDF + order emails + WhatsApp
   alerts, wholesale quotations, Calculator Finder, Compare tool, About/Contact.
-- **UI** — semantic token theme (navy / cyan) with dark mode, profile page.
+- **UI** — responsive navy / blue design system with dark mode, shared components,
+  accessible mobile navigation, and consistent shopping and account pages.
 - **M7 (remaining)** — production: Nginx + Gunicorn, HTTPS, S3-ready media,
   security hardening.
 
@@ -199,7 +207,8 @@ DKIM record to add when you create the sending domain there.
 - **Theming / dark mode** — colors are semantic CSS-variable tokens in
   `static/src/input.css` (`page, surface, ink, muted, line, brand, accent, link` …)
   wired to Tailwind. Never hardcode hex in templates, or dark mode breaks. No
-  gradients; cyan is used for fills/accents, a darker cyan (`link`) for text.
+  gradients; blue identifies actions and links, while red is a restrained brand detail.
+  See [docs/ui-design-system.md](docs/ui-design-system.md) for component and responsive conventions.
 - **SiteSettings** is a singleton (django-solo) — set WhatsApp number, contact
   details, shipping fee, and trust stats there.
 - **Product FAQs** are a per-product **customer Q&A** (`ProductQuestion`):
