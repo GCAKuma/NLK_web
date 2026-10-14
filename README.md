@@ -11,6 +11,8 @@ Django 5 · PostgreSQL · Django Templates + HTMX + Alpine.js + Tailwind CSS ·
 Celery + Redis · WeasyPrint (invoice PDFs) · Docker Compose.
 Production uses Nginx + Gunicorn. Follow [AWS start here](docs/aws-start-here.md)
 for the EC2/Supabase deployment and remaining account setup.
+For updates after the first working release, see
+[GitHub Actions deployment](docs/github-actions-ec2.md).
 
 ## Prerequisites
 

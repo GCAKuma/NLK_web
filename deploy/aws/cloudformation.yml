@@ -17,9 +17,9 @@ Parameters:
     Description: Your public IPv4 address followed by /32. SSH is restricted to this address.
   InstanceType:
     Type: String
-    Default: t3.medium
+    Default: t3.small
     AllowedValues: [t3.small, t3.medium]
-    Description: t3.medium has 4 GiB RAM; t3.small has 2 GiB. Both incur AWS usage charges.
+    Description: Use t3.small (2 GiB) for the credit-funded test. t3.medium (4 GiB) is for paid-plan deployments. Both consume credits or incur usage charges.
   UbuntuImage:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id
