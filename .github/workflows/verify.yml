@@ -26,7 +26,7 @@ jobs:
     # Enable explicitly only after the first manual deployment is working.
     if: >-
       github.event_name == 'push' &&
-      github.ref == 'refs/heads/codex/aws-production' &&
+      github.ref == 'refs/heads/charith/aws-production' &&
       github.repository == 'GCAKuma/NLK_web' &&
       github.event.repository.private == true &&
       vars.EC2_DEPLOY_ENABLED == 'true'
