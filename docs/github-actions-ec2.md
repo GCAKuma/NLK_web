@@ -3,7 +3,7 @@
 This setup is for the existing private GCAKuma/NLK_web repository and the single
 Tokyo EC2 server. It does not add AWS resources or open SSH to the internet.
 
-Flow: push to `codex/aws-production` → GitHub builds the production image and
+Flow: push to `charith/aws-production` → GitHub builds the production image and
 runs isolated PostgreSQL tests → a runner on EC2 fetches the same commit, builds
 the image there, backs up Supabase to S3, migrates, restarts and checks HTTPS.
 The image is built twice; no registry or image-upload storage is required.
@@ -31,7 +31,7 @@ Keep the database URLs and `.env` files on EC2, out of GitHub and workflow logs.
 ## 1. Publish the workflow
 
 The relevant files are `.github/workflows/verify.yml` and
-`deploy/github-deploy.sh`. Commit and push them to `codex/aws-production`.
+`deploy/github-deploy.sh`. Commit and push them to `charith/aws-production`.
 The deploy job remains skipped while `EC2_DEPLOY_ENABLED` is absent or false.
 Tests run on GitHub-hosted Ubuntu; pull requests never use the EC2 runner in
 this workflow.
@@ -92,13 +92,13 @@ Create repository variables (not secrets):
 | `EC2_TEST_URL` | `https://35.79.172.45` (update if the server address changes) |
 | `EC2_DEPLOY_ENABLED` | `true` |
 
-Protect/restrict writes to `codex/aws-production` where your GitHub plan permits.
+Protect/restrict writes to `charith/aws-production` where your GitHub plan permits.
 Only push code you trust. The configured workflow deploys only pushes to this
 branch in the original private repository after its `verify` job passes.
 
 ## 4. Trigger and inspect
 
-Commit a normal application change on `codex/aws-production` and push it.
+Commit a normal application change on `charith/aws-production` and push it.
 On GitHub open **Actions → Test and deploy EC2 → the latest run**.
 Both `verify` and `deploy` should succeed. Check the deployed website too.
 

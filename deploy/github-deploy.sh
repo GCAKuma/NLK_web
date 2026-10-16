@@ -4,7 +4,7 @@ set -euo pipefail
 
 release_sha=${1:?A tested Git commit is required}
 deploy_url=${2:?Set the EC2_TEST_URL repository variable}
-branch=codex/aws-production
+branch=charith/aws-production
 app_dir=/opt/nlk
 
 [[ "$release_sha" =~ ^[0-9a-f]{40}$ ]] || { echo 'Invalid release commit.' >&2; exit 1; }

@@ -56,7 +56,7 @@ deleted; retained data and storage charges require separate management.
 
 ## 3. Connect and put this release on the server
 
-The deployment branch is `codex/aws-production` in
+The deployment branch is `charith/aws-production` in
 `https://github.com/GCAKuma/NLK_web.git`. Before cloning, confirm that branch is
 published and includes this guide, the CloudFormation template and
 `deploy/release.sh`. If it has not been published, commit and push the reviewed
@@ -75,7 +75,7 @@ On the Ubuntu server:
 sudo cloud-init status --wait
 docker --version
 docker compose version
-git clone --branch codex/aws-production https://github.com/GCAKuma/NLK_web.git /opt/nlk
+git clone --branch charith/aws-production https://github.com/GCAKuma/NLK_web.git /opt/nlk
 cd /opt/nlk
 ```
 
